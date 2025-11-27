@@ -106,9 +106,11 @@ export default function WeatherPage() {
               {weather.location.region && `, ${weather.location.region}`}
               {`, ${weather.location.country}`}
             </p>
-            <span className="text-xs text-gray-400">
-              ({weather.location.lat.toFixed(2)}, {weather.location.lon.toFixed(2)})
-            </span>
+            {weather.location.lat && weather.location.lon && (
+              <span className="text-xs text-gray-400">
+                ({weather.location.lat.toFixed(2)}, {weather.location.lon.toFixed(2)})
+              </span>
+            )}
           </div>
         )}
       </div>

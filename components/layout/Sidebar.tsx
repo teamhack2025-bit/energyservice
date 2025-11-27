@@ -20,6 +20,7 @@ import clsx from 'clsx'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
+  { name: 'Smart Home', href: '/energy-home', icon: Plug },
   { name: 'Weather', href: '/weather', icon: Cloud },
   { name: 'Consumption', href: '/consumption', icon: BarChart3 },
   { name: 'Production', href: '/production', icon: Sun },
