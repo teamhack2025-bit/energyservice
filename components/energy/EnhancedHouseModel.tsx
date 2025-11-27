@@ -33,40 +33,15 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
         transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
       />
 
-      {/* Sun with animated rays */}
+      {/* Sun - simple icon only */}
       {solar.production > 0 && (
-        <div className="absolute top-8 right-8 z-10">
-          <motion.div
-            className="relative"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
-          >
-            <Sun className="h-24 w-24 text-yellow-400 drop-shadow-2xl" fill="currentColor" />
-            {/* Animated sun rays */}
-            {[...Array(12)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute top-1/2 left-1/2 w-1.5 h-12 bg-gradient-to-t from-yellow-300 to-transparent origin-bottom rounded-full"
-                style={{
-                  transform: `translate(-50%, -100%) rotate(${i * 30}deg)`,
-                }}
-                animate={{
-                  opacity: [0.4, 1, 0.4],
-                  scaleY: [0.7, 1.3, 0.7],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  delay: i * 0.15,
-                  ease: 'easeInOut',
-                }}
-              />
-            ))}
-          </motion.div>
-          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg whitespace-nowrap">
-            {solar.production.toFixed(1)} kW
-          </div>
-        </div>
+        <motion.div
+          className="absolute top-8 right-8 z-10"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+        >
+          <Sun className="h-20 w-20 text-yellow-400 drop-shadow-2xl" fill="currentColor" />
+        </motion.div>
       )}
 
       {/* Main container for house and components */}
@@ -97,60 +72,12 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
             </p>
           </div>
           
-          {/* Enhanced animated energy flow from/to grid */}
+          {/* Connection line from grid to main flow */}
           {grid.import > 0 && (
-            <svg className="absolute top-full left-1/2 transform -translate-x-1/2" width="8" height="120">
-              <defs>
-                <linearGradient id="gridImportGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#F59E0B" stopOpacity="0" />
-                  <stop offset="50%" stopColor="#F59E0B" stopOpacity="1" />
-                  <stop offset="100%" stopColor="#F59E0B" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              {[...Array(5)].map((_, i) => (
-                <motion.circle
-                  key={i}
-                  cx="4"
-                  cy="0"
-                  r="5"
-                  fill="url(#gridImportGradient)"
-                  animate={{ cy: [0, 120], scale: [1, 1.5, 1] }}
-                  transition={{ 
-                    duration: 1.5, 
-                    repeat: Infinity, 
-                    delay: i * 0.3, 
-                    ease: 'easeInOut' 
-                  }}
-                />
-              ))}
-            </svg>
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-1 h-24 bg-gradient-to-b from-yellow-500/30 to-transparent" />
           )}
           {grid.export > 0 && (
-            <svg className="absolute bottom-full left-1/2 transform -translate-x-1/2" width="8" height="120">
-              <defs>
-                <linearGradient id="gridExportGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#06B6D4" stopOpacity="0" />
-                  <stop offset="50%" stopColor="#06B6D4" stopOpacity="1" />
-                  <stop offset="100%" stopColor="#06B6D4" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              {[...Array(5)].map((_, i) => (
-                <motion.circle
-                  key={i}
-                  cx="4"
-                  cy="120"
-                  r="5"
-                  fill="url(#gridExportGradient)"
-                  animate={{ cy: [120, 0], scale: [1, 1.5, 1] }}
-                  transition={{ 
-                    duration: 1.5, 
-                    repeat: Infinity, 
-                    delay: i * 0.3, 
-                    ease: 'easeInOut' 
-                  }}
-                />
-              ))}
-            </svg>
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-1 h-24 bg-gradient-to-t from-cyan-500/30 to-transparent" />
           )}
         </motion.div>
 
@@ -178,47 +105,52 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
               onClick={() => onZoneClick?.('solar')}
             />
             
-            {/* Solar Panels on Roof */}
-            {solar.production > 0 && (
-              <g>
-                {[0, 1, 2, 3].map((i) => (
-                  <g key={i}>
-                    <rect
-                      x={120 + i * 70}
-                      y={70 + i * 15}
-                      width="65"
-                      height="50"
-                      fill="#1e3a8a"
-                      stroke="#1e40af"
-                      strokeWidth="3"
-                      rx="3"
-                    />
-                    {/* Panel grid */}
-                    <line x1={120 + i * 70 + 32} y1={70 + i * 15} x2={120 + i * 70 + 32} y2={120 + i * 15} stroke="#3b82f6" strokeWidth="2" />
-                    <line x1={120 + i * 70} y1={95 + i * 15} x2={185 + i * 70} y2={95 + i * 15} stroke="#3b82f6" strokeWidth="2" />
-                    {/* Shine effect */}
-                    <motion.rect
-                      x={120 + i * 70}
-                      y={70 + i * 15}
-                      width="65"
-                      height="50"
-                      fill="white"
-                      opacity="0"
-                      animate={{ opacity: [0, 0.3, 0] }}
-                      transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
-                    />
-                  </g>
-                ))}
-              </g>
-            )}
+            {/* Solar Panels on Roof with data */}
+            <g className="cursor-pointer" onClick={() => onZoneClick?.('solar')}>
+              {[0, 1, 2, 3].map((i) => (
+                <g key={i}>
+                  <rect
+                    x={120 + i * 70}
+                    y={70 + i * 15}
+                    width="65"
+                    height="50"
+                    fill="#1e3a8a"
+                    stroke="#1e40af"
+                    strokeWidth="3"
+                    rx="3"
+                  />
+                  {/* Panel grid */}
+                  <line x1={120 + i * 70 + 32} y1={70 + i * 15} x2={120 + i * 70 + 32} y2={120 + i * 15} stroke="#3b82f6" strokeWidth="2" />
+                  <line x1={120 + i * 70} y1={95 + i * 15} x2={185 + i * 70} y2={95 + i * 15} stroke="#3b82f6" strokeWidth="2" />
+                  {/* Shine effect */}
+                  <motion.rect
+                    x={120 + i * 70}
+                    y={70 + i * 15}
+                    width="65"
+                    height="50"
+                    fill="white"
+                    opacity="0"
+                    animate={{ opacity: [0, 0.3, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
+                  />
+                </g>
+              ))}
+              {/* Solar production label on panels */}
+              <foreignObject x="200" y="40" width="100" height="40">
+                <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg text-center">
+                  {solar.production.toFixed(1)} kW
+                </div>
+              </foreignObject>
+            </g>
 
-            {/* House Body */}
+            {/* House Body - More transparent */}
             <rect
               x="70"
               y="160"
               width="360"
               height="240"
               fill="url(#houseGradient)"
+              fillOpacity="0.4"
               stroke="#333"
               strokeWidth="4"
             />
@@ -254,30 +186,44 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
             <circle cx="270" cy="345" r="4" fill="#FFD700" stroke="#333" strokeWidth="1" />
             <line x1="250" y1="290" x2="250" y2="400" stroke="#654321" strokeWidth="2" />
 
-            {/* Garage */}
-            <rect x="430" y="200" width="120" height="200" fill="#e5e5e5" stroke="#333" strokeWidth="4" />
-            <rect x="445" y="250" width="90" height="140" fill="#555" stroke="#333" strokeWidth="3" />
+            {/* Garage - More visible */}
+            <rect x="430" y="200" width="120" height="200" fill="#e5e5e5" fillOpacity="0.8" stroke="#333" strokeWidth="4" />
+            <rect x="445" y="250" width="90" height="140" fill="#555" fillOpacity="0.3" stroke="#333" strokeWidth="3" />
             {/* Garage door lines */}
             {[0, 1, 2, 3, 4].map((i) => (
-              <line key={i} x1="445" y1={250 + i * 28} x2="535" y2={250 + i * 28} stroke="#333" strokeWidth="2" />
+              <line key={i} x1="445" y1={250 + i * 28} x2="535" y2={250 + i * 28} stroke="#666" strokeWidth="2" opacity="0.5" />
             ))}
             
-            {/* EV in garage */}
-            {ev.charging && (
-              <g className="cursor-pointer" onClick={() => onZoneClick?.('ev')}>
-                <ellipse cx="490" cy="360" rx="35" ry="18" fill="#3b82f6" />
-                <rect x="460" y="342" width="60" height="25" fill="#3b82f6" rx="8" />
-                <circle cx="470" cy="378" r="10" fill="#222" stroke="#333" strokeWidth="2" />
-                <circle cx="510" cy="378" r="10" fill="#222" stroke="#333" strokeWidth="2" />
-                {/* Charging bolt */}
+            {/* EV in garage - More visible */}
+            <g className="cursor-pointer" onClick={() => onZoneClick?.('ev')}>
+              {/* Car body */}
+              <ellipse cx="490" cy="365" rx="40" ry="20" fill="#2563eb" stroke="#1e40af" strokeWidth="3" />
+              <rect x="455" y="345" width="70" height="28" fill="#2563eb" stroke="#1e40af" strokeWidth="3" rx="10" />
+              {/* Windows */}
+              <rect x="465" y="350" width="25" height="15" fill="#87CEEB" stroke="#1e40af" strokeWidth="2" rx="3" />
+              <rect x="495" y="350" width="25" height="15" fill="#87CEEB" stroke="#1e40af" strokeWidth="2" rx="3" />
+              {/* Wheels */}
+              <circle cx="470" cy="383" r="12" fill="#1a1a1a" stroke="#333" strokeWidth="3" />
+              <circle cx="470" cy="383" r="6" fill="#666" />
+              <circle cx="510" cy="383" r="12" fill="#1a1a1a" stroke="#333" strokeWidth="3" />
+              <circle cx="510" cy="383" r="6" fill="#666" />
+              {/* Headlights */}
+              <circle cx="525" cy="360" r="3" fill="#FFD700" />
+              {/* Charging indicator */}
+              {ev.charging && (
                 <motion.g
                   animate={{ opacity: [1, 0.3, 1], scale: [1, 1.2, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
-                  <Zap x="475" y="345" width="20" height="20" fill="#10b981" stroke="#fff" strokeWidth="1" />
+                  <circle cx="490" cy="355" r="12" fill="#10b981" opacity="0.9" />
+                  <path d="M 485 350 L 490 355 L 487 355 L 492 362 L 487 357 L 490 357 Z" fill="#fff" />
                 </motion.g>
-              </g>
-            )}
+              )}
+              {/* EV label */}
+              <text x="490" y="400" textAnchor="middle" fontSize="10" fontWeight="bold" fill="#2563eb">
+                EV {ev.soc.toFixed(0)}%
+              </text>
+            </g>
 
             <defs>
               <linearGradient id="windowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -302,6 +248,265 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
             </div>
           </motion.div>
         </div>
+
+        {/* Energy Flow Connections - Proper SVG paths */}
+        <svg className="absolute inset-0 pointer-events-none" width="700" height="500">
+          <defs>
+            {/* Gradients for energy flows */}
+            <linearGradient id="solarFlow" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#10b981" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#10b981" stopOpacity="0.2" />
+            </linearGradient>
+            <linearGradient id="batteryFlow" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.2" />
+            </linearGradient>
+            <linearGradient id="gridImportFlow" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.2" />
+            </linearGradient>
+            <linearGradient id="gridExportFlow" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.2" />
+            </linearGradient>
+          </defs>
+
+          {/* Connection lines (static, subtle) */}
+          {solar.production > 0 && (
+            <line x1="350" y1="120" x2="350" y2="250" stroke="#10b981" strokeWidth="3" strokeOpacity="0.2" strokeDasharray="5,5" />
+          )}
+          {battery.power !== 0 && (
+            <path d="M 140 450 Q 250 400 350 350" stroke="#3b82f6" strokeWidth="3" strokeOpacity="0.2" strokeDasharray="5,5" fill="none" />
+          )}
+          {grid.import > 0 && (
+            <path d="M 80 120 Q 200 180 320 280" stroke="#f59e0b" strokeWidth="3" strokeOpacity="0.2" strokeDasharray="5,5" fill="none" />
+          )}
+          {grid.export > 0 && (
+            <path d="M 320 280 Q 200 180 80 120" stroke="#06b6d4" strokeWidth="3" strokeOpacity="0.2" strokeDasharray="5,5" fill="none" />
+          )}
+
+          {/* Solar to House - Vertical flow */}
+          {solar.production > 0 && (
+            <>
+              {[...Array(6)].map((_, i) => (
+                <motion.circle
+                  key={`solar-${i}`}
+                  cx="350"
+                  cy="120"
+                  r="5"
+                  fill="#10b981"
+                  initial={{ cy: 120, opacity: 0 }}
+                  animate={{ 
+                    cy: [120, 250],
+                    opacity: [0, 1, 1, 0]
+                  }}
+                  transition={{ 
+                    duration: 2, 
+                    repeat: Infinity, 
+                    delay: i * 0.3,
+                    ease: 'easeInOut'
+                  }}
+                />
+              ))}
+            </>
+          )}
+
+          {/* Battery to House - Curved path */}
+          {battery.power < 0 && (
+            <>
+              <path id="batteryToHousePath" d="M 140 450 Q 250 400 350 350" fill="none" />
+              {[...Array(6)].map((_, i) => (
+                <motion.circle
+                  key={`battery-discharge-${i}`}
+                  r="5"
+                  fill="#3b82f6"
+                >
+                  <animateMotion
+                    dur="2.5s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.4}s`}
+                    path="M 140 450 Q 250 400 350 350"
+                  />
+                  <animate
+                    attributeName="opacity"
+                    values="0;1;1;0"
+                    dur="2.5s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.4}s`}
+                  />
+                </motion.circle>
+              ))}
+            </>
+          )}
+
+          {/* House to Battery - Charging */}
+          {battery.power > 0 && (
+            <>
+              <path id="houseToBatteryPath" d="M 350 350 Q 250 400 140 450" fill="none" />
+              {[...Array(6)].map((_, i) => (
+                <motion.circle
+                  key={`battery-charge-${i}`}
+                  r="5"
+                  fill="#10b981"
+                >
+                  <animateMotion
+                    dur="2.5s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.4}s`}
+                    path="M 350 350 Q 250 400 140 450"
+                  />
+                  <animate
+                    attributeName="opacity"
+                    values="0;1;1;0"
+                    dur="2.5s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.4}s`}
+                  />
+                </motion.circle>
+              ))}
+            </>
+          )}
+
+          {/* Grid Import - Curved path to house */}
+          {grid.import > 0 && (
+            <>
+              <path id="gridImportPath" d="M 80 120 Q 200 180 320 280" fill="none" />
+              {[...Array(7)].map((_, i) => (
+                <motion.circle
+                  key={`grid-import-${i}`}
+                  r="5"
+                  fill="#f59e0b"
+                >
+                  <animateMotion
+                    dur="2s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.28}s`}
+                    path="M 80 120 Q 200 180 320 280"
+                  />
+                  <animate
+                    attributeName="opacity"
+                    values="0;1;1;0"
+                    dur="2s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.28}s`}
+                  />
+                </motion.circle>
+              ))}
+            </>
+          )}
+
+          {/* Grid Export - Curved path from house */}
+          {grid.export > 0 && (
+            <>
+              <path id="gridExportPath" d="M 320 280 Q 200 180 80 120" fill="none" />
+              {[...Array(7)].map((_, i) => (
+                <motion.circle
+                  key={`grid-export-${i}`}
+                  r="5"
+                  fill="#06b6d4"
+                >
+                  <animateMotion
+                    dur="2s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.28}s`}
+                    path="M 320 280 Q 200 180 80 120"
+                  />
+                  <animate
+                    attributeName="opacity"
+                    values="0;1;1;0"
+                    dur="2s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.28}s`}
+                  />
+                </motion.circle>
+              ))}
+            </>
+          )}
+
+          {/* EV Charging - from house to garage */}
+          {ev.charging && (
+            <>
+              <path id="evChargePath" d="M 380 350 L 550 380" fill="none" />
+              {[...Array(5)].map((_, i) => (
+                <motion.circle
+                  key={`ev-charge-${i}`}
+                  r="4"
+                  fill="#10b981"
+                >
+                  <animateMotion
+                    dur="1.8s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.35}s`}
+                    path="M 380 350 L 550 380"
+                  />
+                  <animate
+                    attributeName="opacity"
+                    values="0;1;1;0"
+                    dur="1.8s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.35}s`}
+                  />
+                </motion.circle>
+              ))}
+            </>
+          )}
+
+          {/* Gas to House - if heating active */}
+          {gas.heatingActive && (
+            <>
+              <path id="gasFlowPath" d="M 50 250 L 280 280" fill="none" />
+              {[...Array(4)].map((_, i) => (
+                <motion.circle
+                  key={`gas-${i}`}
+                  r="4"
+                  fill="#a855f7"
+                >
+                  <animateMotion
+                    dur="2.2s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.55}s`}
+                    path="M 50 250 L 280 280"
+                  />
+                  <animate
+                    attributeName="opacity"
+                    values="0;1;1;0"
+                    dur="2.2s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.55}s`}
+                  />
+                </motion.circle>
+              ))}
+            </>
+          )}
+
+          {/* Heat Pump to House */}
+          {heatPump.active && (
+            <>
+              <path id="heatPumpPath" d="M 580 450 Q 500 400 400 350" fill="none" />
+              {[...Array(4)].map((_, i) => (
+                <motion.circle
+                  key={`heatpump-${i}`}
+                  r="4"
+                  fill="#6366f1"
+                >
+                  <animateMotion
+                    dur="2s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.5}s`}
+                    path="M 580 450 Q 500 400 400 350"
+                  />
+                  <animate
+                    attributeName="opacity"
+                    values="0;1;1;0"
+                    dur="2s"
+                    repeatCount="indefinite"
+                    begin={`${i * 0.5}s`}
+                  />
+                </motion.circle>
+              ))}
+            </>
+          )}
+        </svg>
 
         {/* Battery - Bottom Left */}
         <motion.div
@@ -344,6 +549,10 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
               {battery.power > 0 ? `+${battery.power.toFixed(1)}` : battery.power.toFixed(1)} kW
             </p>
           </div>
+          {/* Connection line to house */}
+          {battery.power !== 0 && (
+            <div className="absolute top-0 right-0 w-48 h-1 bg-gradient-to-r from-blue-500/30 to-transparent transform -translate-y-20 translate-x-20" />
+          )}
         </motion.div>
 
         {/* Heat Pump - Bottom Right */}
@@ -377,6 +586,8 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
               <p className="text-sm font-bold text-indigo-600">{heatPump.currentTemp}°C</p>
               <p className="text-xs text-gray-600">{heatPump.power.toFixed(1)} kW</p>
             </div>
+            {/* Connection line to house */}
+            <div className="absolute top-0 left-0 w-48 h-1 bg-gradient-to-l from-indigo-500/30 to-transparent transform -translate-y-20 -translate-x-20" />
           </motion.div>
         )}
 
@@ -400,6 +611,8 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white px-2 py-1 rounded-lg shadow-lg border-2 border-purple-300 whitespace-nowrap">
               <p className="text-xs font-bold text-purple-600">{gas.flowRate.toFixed(1)} m³/h</p>
             </div>
+            {/* Connection line to house */}
+            <div className="absolute top-1/2 right-0 w-32 h-1 bg-gradient-to-r from-purple-500/30 to-transparent transform translate-x-full" />
           </motion.div>
         )}
       </div>
