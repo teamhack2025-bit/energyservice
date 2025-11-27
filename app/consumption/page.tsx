@@ -98,11 +98,7 @@ export default function ConsumptionPage() {
       <div className="mb-6">
         <ChartCard title="Consumption Over Time">
           <LineChart
-            data={consumptionData.map(d => ({
-              timestamp: d.timestamp,
-              consumptionKwh: d.consumptionKwh,
-              cost: d.cost,
-            }))}
+            data={consumptionData}
             dataKey="consumptionKwh"
             yAxisLabel="kWh"
             height={300}
