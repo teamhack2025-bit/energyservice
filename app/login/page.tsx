@@ -50,29 +50,30 @@ function LoginForm() {
     setSuccess('')
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      // Use Supabase client directly for proper session management
+      const { createClient } = await import('@supabase/supabase-js')
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
+
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed')
+      if (authError) {
+        throw new Error(authError.message)
       }
 
-      // Store session info (in production, use httpOnly cookies)
-      if (data.session) {
-        localStorage.setItem('accessToken', data.session.accessToken)
-        localStorage.setItem('refreshToken', data.session.refreshToken)
+      if (!data.session) {
+        throw new Error('Failed to create session')
       }
 
       setSuccess('Login successful! Redirecting...')
       setTimeout(() => {
         router.push('/dashboard')
+        router.refresh()
       }, 1000)
     } catch (err: any) {
       setError(err.message || 'Login failed')

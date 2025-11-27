@@ -6,12 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-data": "tsx scripts/generate-data.ts",
+    "test-api": "node scripts/test-api.js"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.86.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.0.6",
+    "dotenv": "^17.2.3",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.303.0",
     "next": "^14.0.4",

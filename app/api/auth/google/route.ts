@@ -9,8 +9,7 @@ export async function GET(request: NextRequest) {
     const redirectTo = searchParams.get('redirectTo') || '/dashboard'
 
     // Generate Google OAuth URL
-    // Supabase will redirect to their callback URL, then to our callback
-    const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}`
+    const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/callback`
     
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',

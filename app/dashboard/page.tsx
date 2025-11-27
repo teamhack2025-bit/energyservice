@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import AppShell from '@/components/layout/AppShell'
 import MetricCard from '@/components/ui/MetricCard'
 import ChartCard from '@/components/ui/ChartCard'
@@ -12,17 +13,34 @@ import { Download, FileText, AlertCircle, Zap, TrendingUp, Sun, Wind, ArrowUp, A
 import Link from 'next/link'
 
 export default function DashboardPage() {
+  const [realData, setRealData] = React.useState<any>(null)
+  const [loading, setLoading] = React.useState(true)
+  
+  React.useEffect(() => {
+    fetch('/api/dashboard/real')
+      .then(res => res.json())
+      .then(data => {
+        setRealData(data)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Error fetching real data:', err)
+        setLoading(false)
+      })
+  }, [])
+  
+  // Use real data if available, otherwise use mock data
   const { data: netBalanceData, loading: netBalanceLoading } = useNetBalanceData(30)
-  const netBalanceDataToUse = netBalanceData.length > 0 ? netBalanceData : generateNetBalanceData(30)
-  const todayNet = netBalanceDataToUse[netBalanceDataToUse.length - 1]?.netKwh || -2.5
-  const monthCost = 78.95
-  const monthRevenue = 14.05
-  const produced = 4.5
-  const consumed = 2.8
+  const netBalanceDataToUse = realData?.last30Days || (netBalanceData.length > 0 ? netBalanceData : generateNetBalanceData(30))
+  const todayNet = realData?.todayStats?.netBalance || (netBalanceDataToUse[netBalanceDataToUse.length - 1]?.netKwh || -2.5)
+  const monthCost = realData?.monthlyStats?.cost || 78.95
+  const monthRevenue = realData?.monthlyStats?.revenue || 14.05
+  const produced = realData?.todayStats?.production || 4.5
+  const consumed = realData?.todayStats?.consumption || 2.8
   const netBalance = produced - consumed
-  const todayConsumption = 15.2
-  const todayProduction = 18.5
-  const efficiency = 72
+  const todayConsumption = realData?.todayStats?.consumption || 15.2
+  const todayProduction = realData?.todayStats?.production || 18.5
+  const efficiency = realData?.todayStats?.efficiency || 72
 
   const metrics = [
     {
@@ -59,12 +77,12 @@ export default function DashboardPage() {
     },
   ]
 
-  const consumptionData = netBalanceDataToUse.map((d) => ({
+  const consumptionData = netBalanceDataToUse.map((d: any) => ({
     timestamp: d.timestamp,
     consumption: d.importKwh,
   }))
 
-  const productionData = netBalanceDataToUse.map((d) => ({
+  const productionData = netBalanceDataToUse.map((d: any) => ({
     timestamp: d.timestamp,
     production: d.exportKwh,
   }))
@@ -249,7 +267,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <LineChart
-            data={last7Days.map(d => ({ timestamp: d.timestamp, consumption: d.importKwh }))}
+            data={last7Days.map((d: any) => ({ timestamp: d.timestamp, consumption: d.importKwh }))}
             dataKey="consumption"
             yAxisLabel="kWh"
             height={180}
@@ -267,7 +285,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <LineChart
-            data={last7Days.map(d => ({ timestamp: d.timestamp, production: d.exportKwh }))}
+            data={last7Days.map((d: any) => ({ timestamp: d.timestamp, production: d.exportKwh }))}
             dataKey="production"
             yAxisLabel="kWh"
             height={180}

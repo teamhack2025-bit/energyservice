@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { P2PMarketData } from '@/types/community'
 import { Loader2, RefreshCw } from 'lucide-react'
+import AppShell from '@/components/layout/AppShell'
 import MarketplaceHeader from '@/components/community/MarketplaceHeader'
 import BuyOffers from '@/components/community/BuyOffers'
 import SellOffers from '@/components/community/SellOffers'
@@ -51,29 +52,33 @@ export default function MarketplacePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading marketplace...</p>
+      <AppShell>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+            <p className="text-gray-600">Loading marketplace...</p>
+          </div>
         </div>
-      </div>
+      </AppShell>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-50 flex items-center justify-center">
-        <div className="bg-white rounded-xl border-2 border-red-200 p-8 max-w-md">
-          <h2 className="text-xl font-bold text-red-600 mb-2">Error Loading Marketplace</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <button
-            onClick={fetchMarketData}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Try Again
-          </button>
+      <AppShell>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="bg-white rounded-xl border-2 border-red-200 p-8 max-w-md">
+            <h2 className="text-xl font-bold text-red-600 mb-2">Error Loading Marketplace</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button
+              onClick={fetchMarketData}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
         </div>
-      </div>
+      </AppShell>
     )
   }
 
@@ -82,8 +87,9 @@ export default function MarketplacePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-50 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <AppShell>
+      <div className="bg-gradient-to-br from-blue-50 via-green-50 to-blue-50 p-4 md:p-8">
+        <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -149,7 +155,8 @@ export default function MarketplacePage() {
             ))}
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </AppShell>
   )
 }

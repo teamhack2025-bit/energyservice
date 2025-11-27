@@ -1,16 +1,60 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Bell, ChevronDown, User, LogOut, Settings } from 'lucide-react'
-import { mockUser, mockNotifications } from '@/lib/mockData'
+import { mockNotifications } from '@/lib/mockData'
+import { createClient } from '@/lib/supabase-browser'
 
 export default function Header() {
   const router = useRouter()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [customerData, setCustomerData] = useState<any>(null)
+  const [authUser, setAuthUser] = useState<any>(null)
   const unreadCount = mockNotifications.filter(n => !n.read).length
+  const supabase = createClient()
+
+  useEffect(() => {
+    async function loadUserData() {
+      // Get authenticated user
+      const { data: { user } } = await supabase.auth.getUser()
+      console.log('Header - Auth User:', user)
+      setAuthUser(user)
+      
+      if (user) {
+        // Try to find customer by auth_user_id first
+        const { data: customerByAuth } = await supabase
+          .from('customers')
+          .select('*')
+          .eq('auth_user_id', user.id)
+          .maybeSingle()
+        
+        console.log('Header - Customer by auth_user_id:', customerByAuth)
+        
+        // Fallback to email
+        if (!customerByAuth) {
+          const { data: customerByEmail } = await supabase
+            .from('customers')
+            .select('*')
+            .eq('email', user.email)
+            .maybeSingle()
+          
+          console.log('Header - Customer by email:', customerByEmail)
+          setCustomerData(customerByEmail)
+        } else {
+          setCustomerData(customerByAuth)
+        }
+      }
+    }
+    loadUserData()
+  }, [])
+
+  // Use customer data if available, otherwise fall back to auth user or mock
+  const displayName = customerData?.name || authUser?.user_metadata?.full_name || 'User'
+  const displayEmail = customerData?.email || authUser?.email || ''
+  const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
 
   const handleLogout = () => {
     setShowUserMenu(false)
@@ -85,10 +129,10 @@ export default function Header() {
               className="flex items-center space-x-2 p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-medium">
-                {mockUser.firstName[0]}{mockUser.lastName[0]}
+                {initials}
               </div>
               <span className="hidden md:block text-sm font-medium">
-                {mockUser.firstName} {mockUser.lastName}
+                {displayName}
               </span>
               <ChevronDown className="hidden md:block h-4 w-4 text-gray-500" />
             </button>

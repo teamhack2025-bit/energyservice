@@ -28,12 +28,28 @@ export default function EnergyHomePage() {
 
   async function fetchEnergyData() {
     try {
-      const response = await fetch('/api/energy/live')
-      if (!response.ok) throw new Error('Failed to fetch energy data')
-      const data = await response.json()
-      setEnergyFlow(data)
-      setLastUpdate(new Date())
-      setError(null)
+      // Fetch the full smart home data from external API
+      const houseResponse = await fetch('/api/energy/smart-home')
+      
+      if (houseResponse.ok) {
+        const houseData = await houseResponse.json()
+        console.log('Received house data:', houseData)
+        setEnergyFlow(houseData)
+        setLastUpdate(new Date())
+        setError(null)
+      } else {
+        console.error('Smart home API failed:', houseResponse.status)
+        // Fallback to mock data if not logged in or API fails
+        const mockResponse = await fetch('/api/energy/live')
+        if (mockResponse.ok) {
+          const data = await mockResponse.json()
+          setEnergyFlow(data)
+          setLastUpdate(new Date())
+          setError(null)
+        } else {
+          throw new Error('Failed to fetch energy data')
+        }
+      }
     } catch (err) {
       console.error('Energy data fetch error:', err)
       setError('Failed to load energy data')
