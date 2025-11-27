@@ -19,23 +19,39 @@ export default function EnergyHomePage() {
   const [error, setError] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
   const [selectedZone, setSelectedZone] = useState<string | null>(null)
+  const [realtimeData, setRealtimeData] = useState<any>(null)
   
-  // Generate static data for other components
-  const timelineData = generateTimelineData()
-  const financialData = generateFinancialSummary()
+  // Generate static data for other components (will be replaced with real data)
+  const timelineData = realtimeData?.timeline_24h || generateTimelineData()
+  const financialData = realtimeData?.summary ? {
+    today: {
+      cost: realtimeData.summary.cost_today || 0,
+      revenue: realtimeData.summary.savings_today || 0,
+      netBalance: (realtimeData.summary.savings_today || 0) - (realtimeData.summary.cost_today || 0),
+      co2Saved: (realtimeData.summary.solar_production_today || 0) * 0.5, // Estimate: 0.5kg CO2 per kWh
+    },
+    month: {
+      cost: (realtimeData.summary.cost_today || 0) * 30, // Estimate
+      revenue: (realtimeData.summary.savings_today || 0) * 30, // Estimate
+      netBalance: ((realtimeData.summary.savings_today || 0) - (realtimeData.summary.cost_today || 0)) * 30,
+      savingsVsLastMonth: 0, // Not available from API
+    },
+  } : generateFinancialSummary()
   const alerts = generateAlerts()
   const energyScore = generateEnergyScore()
 
   async function fetchEnergyData() {
     try {
-      // Fetch the full smart home data from external API
-      const houseResponse = await fetch('/api/energy/smart-home')
+      // Fetch both smart home data and realtime timeline data
+      const [houseResponse, realtimeResponse] = await Promise.all([
+        fetch('/api/energy/smart-home'),
+        fetch('/api/energy/realtime')
+      ])
       
       if (houseResponse.ok) {
         const houseData = await houseResponse.json()
         console.log('Received house data:', houseData)
         setEnergyFlow(houseData)
-        setLastUpdate(new Date())
         setError(null)
       } else {
         console.error('Smart home API failed:', houseResponse.status)
@@ -44,12 +60,20 @@ export default function EnergyHomePage() {
         if (mockResponse.ok) {
           const data = await mockResponse.json()
           setEnergyFlow(data)
-          setLastUpdate(new Date())
           setError(null)
         } else {
           throw new Error('Failed to fetch energy data')
         }
       }
+      
+      // Fetch realtime timeline data
+      if (realtimeResponse.ok) {
+        const realtimeApiData = await realtimeResponse.json()
+        console.log('Received realtime data:', realtimeApiData)
+        setRealtimeData(realtimeApiData)
+      }
+      
+      setLastUpdate(new Date())
     } catch (err) {
       console.error('Energy data fetch error:', err)
       setError('Failed to load energy data')

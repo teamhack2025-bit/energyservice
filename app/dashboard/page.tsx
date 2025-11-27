@@ -2,52 +2,48 @@
 
 import React from 'react'
 import AppShell from '@/components/layout/AppShell'
-import MetricCard from '@/components/ui/MetricCard'
-import ChartCard from '@/components/ui/ChartCard'
 import LineChart from '@/components/charts/LineChart'
-import DonutChart from '@/components/charts/DonutChart'
 import WeatherWidgetCompact from '@/components/weather/WeatherWidgetCompact'
-import { generateNetBalanceData } from '@/lib/mockData'
-import { useNetBalanceData } from '@/lib/hooks/useSupabaseData'
-import { Download, FileText, AlertCircle, Zap, TrendingUp, Sun, Wind, ArrowUp, ArrowDown, Activity } from 'lucide-react'
+import { Download, FileText, AlertCircle, Zap, TrendingUp, Sun, Activity } from 'lucide-react'
 import Link from 'next/link'
 
 export default function DashboardPage() {
-  const [realData, setRealData] = React.useState<any>(null)
+  const [dashboardData, setDashboardData] = React.useState<any>(null)
   const [loading, setLoading] = React.useState(true)
+  const [fallbackUsed, setFallbackUsed] = React.useState(false)
   
   React.useEffect(() => {
-    fetch('/api/dashboard/real')
+    fetch('/api/dashboard/overview')
       .then(res => res.json())
       .then(data => {
-        setRealData(data)
+        setDashboardData(data)
+        setFallbackUsed(data.fallbackUsed || false)
         setLoading(false)
       })
       .catch(err => {
-        console.error('Error fetching real data:', err)
+        console.error('Error fetching dashboard data:', err)
         setLoading(false)
       })
   }, [])
   
-  // Use real data if available, otherwise use mock data
-  const { data: netBalanceData, loading: netBalanceLoading } = useNetBalanceData(30)
-  const netBalanceDataToUse = realData?.last30Days || (netBalanceData.length > 0 ? netBalanceData : generateNetBalanceData(30))
-  const todayNet = realData?.todayStats?.netBalance || (netBalanceDataToUse[netBalanceDataToUse.length - 1]?.netKwh || -2.5)
-  const monthCost = realData?.monthlyStats?.cost || 78.95
-  const monthRevenue = realData?.monthlyStats?.revenue || 14.05
-  const produced = realData?.todayStats?.production || 4.5
-  const consumed = realData?.todayStats?.consumption || 2.8
-  const netBalance = produced - consumed
-  const todayConsumption = realData?.todayStats?.consumption || 15.2
-  const todayProduction = realData?.todayStats?.production || 18.5
-  const efficiency = realData?.todayStats?.efficiency || 72
+  // Extract data from API response
+  const todayNet = dashboardData?.todayStats?.netBalance || -2.5
+  const monthCost = dashboardData?.monthlyStats?.cost || 78.95
+  const monthRevenue = dashboardData?.monthlyStats?.revenue || 14.05
+  const todayConsumption = dashboardData?.todayStats?.consumption || 15.2
+  const todayProduction = dashboardData?.todayStats?.production || 18.5
+  const efficiency = dashboardData?.todayStats?.efficiency || 72
 
   const metrics = [
     {
       title: 'Net Today',
       value: todayNet.toFixed(1),
       unit: 'kWh',
-      trend: { value: 12, period: 'vs last month', direction: 'down' as const },
+      trend: { 
+        value: Math.abs(dashboardData?.metrics?.netToday?.change || 12), 
+        period: 'vs last month', 
+        direction: dashboardData?.metrics?.netToday?.direction || 'down' as const 
+      },
       color: 'blue' as const,
       icon: Zap,
     },
@@ -55,7 +51,11 @@ export default function DashboardPage() {
       title: 'Cost This Month',
       value: monthCost.toFixed(2),
       unit: '€',
-      trend: { value: 6, period: 'vs last month', direction: 'down' as const },
+      trend: { 
+        value: Math.abs(dashboardData?.metrics?.costThisMonth?.change || 6), 
+        period: 'vs last month', 
+        direction: dashboardData?.metrics?.costThisMonth?.direction || 'down' as const 
+      },
       color: 'red' as const,
       icon: TrendingUp,
     },
@@ -63,7 +63,11 @@ export default function DashboardPage() {
       title: 'Revenue This Month',
       value: monthRevenue.toFixed(2),
       unit: '€',
-      trend: { value: 8, period: 'vs last month', direction: 'up' as const },
+      trend: { 
+        value: Math.abs(dashboardData?.metrics?.revenueThisMonth?.change || 8), 
+        period: 'vs last month', 
+        direction: dashboardData?.metrics?.revenueThisMonth?.direction || 'up' as const 
+      },
       color: 'green' as const,
       icon: Sun,
     },
@@ -71,30 +75,40 @@ export default function DashboardPage() {
       title: 'Efficiency',
       value: efficiency,
       unit: '%',
-      trend: { value: 5, period: 'vs last month', direction: 'up' as const },
+      trend: { 
+        value: Math.abs(dashboardData?.metrics?.efficiency?.change || 5), 
+        period: 'vs last month', 
+        direction: dashboardData?.metrics?.efficiency?.direction || 'up' as const 
+      },
       color: 'purple' as const,
       icon: Activity,
     },
   ]
 
-  const consumptionData = netBalanceDataToUse.map((d: any) => ({
-    timestamp: d.timestamp,
-    consumption: d.importKwh,
-  }))
+  // Get chart data
+  const netBalanceDataToUse = dashboardData?.last30Days || []
+  const last7DaysConsumption = dashboardData?.last7DaysConsumption || []
+  const last7DaysProduction = dashboardData?.last7DaysProduction || []
 
-  const productionData = netBalanceDataToUse.map((d: any) => ({
-    timestamp: d.timestamp,
-    production: d.exportKwh,
-  }))
+  // Flatten hourly consumption data for chart
+  const consumptionChartData = last7DaysConsumption.flatMap((day: any) => 
+    day.hourlyValues?.map((value: number, hour: number) => ({
+      timestamp: `${day.date} ${hour.toString().padStart(2, '0')}:00`,
+      consumption: value,
+      date: day.date,
+      hour
+    })) || []
+  )
 
-  const netBalanceChartData = [
-    { label: 'Produced', value: produced, color: '#0066CC' },
-    { label: 'Consumed', value: consumed, color: '#9333EA' },
-    { label: 'Net', value: netBalance, color: '#00AA44' },
-  ]
-
-  // Last 7 days data for compact charts
-  const last7Days = netBalanceDataToUse.slice(-7)
+  // Flatten hourly production data for chart
+  const productionChartData = last7DaysProduction.flatMap((day: any) => 
+    day.hourlyValues?.map((value: number, hour: number) => ({
+      timestamp: `${day.date} ${hour.toString().padStart(2, '0')}:00`,
+      production: value,
+      date: day.date,
+      hour
+    })) || []
+  )
 
   return (
     <AppShell>
@@ -105,9 +119,17 @@ export default function DashboardPage() {
           <p className="text-sm text-gray-600">Real-time energy monitoring</p>
         </div>
         <div className="flex items-center space-x-2">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
-            Live
+          {fallbackUsed && (
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
+              <AlertCircle className="w-3 h-3 mr-1" />
+              Using cached data
+            </span>
+          )}
+          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+            fallbackUsed ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'
+          }`}>
+            <span className={`w-1.5 h-1.5 ${fallbackUsed ? 'bg-yellow-500' : 'bg-green-500'} rounded-full mr-1.5 ${!fallbackUsed && 'animate-pulse'}`}></span>
+            {fallbackUsed ? 'Offline' : 'Live'}
           </span>
         </div>
       </div>
@@ -193,64 +215,42 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Main Content Grid - Compact */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-        {/* Net Balance Chart - 2 columns */}
-        <div className="lg:col-span-2">
-          <div className="card bg-gradient-to-br from-white to-blue-50/30 border-blue-100 shadow-lg hover:shadow-xl transition-shadow p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">Net Balance</h3>
-                <p className="text-xs text-gray-600">Last 30 days</p>
+      {/* Net Balance Chart - Full Width */}
+      <div className="mb-4">
+        <div className="card bg-gradient-to-br from-white to-blue-50/30 border-blue-100 shadow-lg hover:shadow-xl transition-shadow p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">Net Balance</h3>
+              <p className="text-xs text-gray-600">Last 30 days</p>
+            </div>
+            <div className="flex items-center space-x-2 text-xs">
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                <span className="text-gray-600">Import</span>
               </div>
-              <div className="flex items-center space-x-2 text-xs">
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                  <span className="text-gray-600">Import</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                  <span className="text-gray-600">Export</span>
-                </div>
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <span className="text-gray-600">Export</span>
               </div>
             </div>
-            {netBalanceLoading ? (
-              <div className="h-[250px] flex items-center justify-center">
-                <div className="text-gray-500">Loading data...</div>
-              </div>
-            ) : (
-              <LineChart
-                data={netBalanceDataToUse}
-                dataKey="netKwh"
-                yAxisLabel="kWh"
-                height={250}
-                multipleSeries={[
-                  { key: 'importKwh', name: 'Import', color: '#CC0000' },
-                  { key: 'exportKwh', name: 'Export', color: '#00AA44' },
-                ]}
-                showLegend
-              />
-            )}
           </div>
-        </div>
-
-        {/* Net Energy Balance Donut - Compact */}
-        <div className="card bg-gradient-to-br from-white to-purple-50/30 border-purple-100 shadow-lg hover:shadow-xl transition-shadow p-4">
-          <h3 className="text-lg font-bold text-gray-900 mb-3">Energy Balance</h3>
-          <div className="flex flex-col items-center justify-center py-2">
-            <DonutChart data={netBalanceChartData} size={180} />
-            <div className="mt-4 space-y-1.5 w-full">
-              {netBalanceChartData.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-white/60 rounded-lg text-xs">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></div>
-                    <span className="font-medium text-gray-700">{item.label}</span>
-                  </div>
-                  <span className="font-bold text-gray-900">{item.value}kWh</span>
-                </div>
-              ))}
+          {loading ? (
+            <div className="h-[250px] flex items-center justify-center">
+              <div className="text-gray-500">Loading data...</div>
             </div>
-          </div>
+          ) : (
+            <LineChart
+              data={netBalanceDataToUse}
+              dataKey="netKwh"
+              yAxisLabel="kWh"
+              height={250}
+              multipleSeries={[
+                { key: 'importKwh', name: 'Import', color: '#CC0000' },
+                { key: 'exportKwh', name: 'Export', color: '#00AA44' },
+              ]}
+              showLegend
+            />
+          )}
         </div>
       </div>
 
@@ -267,7 +267,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <LineChart
-            data={last7Days.map((d: any) => ({ timestamp: d.timestamp, consumption: d.importKwh }))}
+            data={consumptionChartData}
             dataKey="consumption"
             yAxisLabel="kWh"
             height={180}
@@ -285,7 +285,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <LineChart
-            data={last7Days.map((d: any) => ({ timestamp: d.timestamp, production: d.exportKwh }))}
+            data={productionChartData}
             dataKey="production"
             yAxisLabel="kWh"
             height={180}
