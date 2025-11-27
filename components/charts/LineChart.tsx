@@ -3,13 +3,8 @@
 import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { format } from 'date-fns'
 
-interface DataPoint {
-  timestamp: Date | string
-  [key: string]: number | Date | string
-}
-
 interface LineChartProps {
-  data: DataPoint[]
+  data: Array<Record<string, any>>
   dataKey: string
   xAxisKey?: string
   yAxisLabel?: string
@@ -36,12 +31,17 @@ export default function LineChart({
     return format(value, 'MMM dd')
   }
 
-  const chartData = data.map((item) => ({
-    ...item,
-    timestamp: typeof item[xAxisKey] === 'string' 
-      ? formatDate(item[xAxisKey] as string)
-      : formatDate(item[xAxisKey] as Date),
-  }))
+  const chartData = data.map((item) => {
+    const xValue = item[xAxisKey] || item.timestamp
+    return {
+      ...item,
+      timestamp: typeof xValue === 'string' 
+        ? formatDate(xValue)
+        : xValue instanceof Date 
+        ? formatDate(xValue)
+        : formatDate(new Date(xValue)),
+    }
+  })
 
   return (
     <ResponsiveContainer width="100%" height={height}>

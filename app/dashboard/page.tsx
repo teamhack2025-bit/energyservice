@@ -58,7 +58,7 @@ export default function DashboardPage() {
 
   const productionData = netBalanceData.map((d) => ({
     timestamp: d.timestamp,
-    production: d.exportedKwh,
+    production: d.exportKwh,
   }))
 
   const netBalanceChartData = [
@@ -115,7 +115,9 @@ export default function DashboardPage() {
               <p className="text-sm font-medium text-gray-600 mb-2">{metric.title}</p>
               <div className="flex items-baseline">
                 <p className="text-3xl font-bold text-gray-900">
-                  {typeof metric.value === 'number' ? metric.value.toLocaleString() : metric.value}
+                  {typeof metric.value === 'number' 
+                    ? (metric.value as number).toLocaleString() 
+                    : String(metric.value)}
                 </p>
                 {metric.unit && (
                   <span className="ml-2 text-lg text-gray-500 font-medium">{metric.unit}</span>
