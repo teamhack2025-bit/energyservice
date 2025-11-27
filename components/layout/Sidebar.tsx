@@ -14,7 +14,8 @@ import {
   Bell, 
   HelpCircle, 
   Settings,
-  Cloud
+  Cloud,
+  Users
 } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -22,6 +23,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Smart Home', href: '/energy-home', icon: Plug },
   { name: 'Weather', href: '/weather', icon: Cloud },
+  { name: 'Community', href: '/community', icon: Users },
   { name: 'Consumption', href: '/consumption', icon: BarChart3 },
   { name: 'Production', href: '/production', icon: Sun },
   { name: 'Net Balance', href: '/net-balance', icon: DollarSign },

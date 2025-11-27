@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
     // Generate Google OAuth URL
     // Supabase will redirect to their callback URL, then to our callback
-    const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`
+    const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}`
     
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
