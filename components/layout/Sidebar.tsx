@@ -13,12 +13,14 @@ import {
   TrendingUp, 
   Bell, 
   HelpCircle, 
-  Settings 
+  Settings,
+  Cloud
 } from 'lucide-react'
 import clsx from 'clsx'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
+  { name: 'Weather', href: '/weather', icon: Cloud },
   { name: 'Consumption', href: '/consumption', icon: BarChart3 },
   { name: 'Production', href: '/production', icon: Sun },
   { name: 'Net Balance', href: '/net-balance', icon: DollarSign },

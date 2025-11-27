@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Cloud, Sun, Droplets, Wind, Eye, Gauge, Sunrise, Sunset, CloudRain, CloudSnow, CloudLightning, CloudDrizzle } from 'lucide-react'
+import { Cloud, Sun, Droplets, Wind, Eye, Gauge, Sunrise, Sunset, CloudRain, CloudSnow, CloudLightning, CloudDrizzle, AlertTriangle, MapPin } from 'lucide-react'
 import { format } from 'date-fns'
+import Link from 'next/link'
 
 interface WeatherData {
   current: {
@@ -20,19 +21,24 @@ interface WeatherData {
     wind: {
       speed: number
       deg: number
+      dir?: string
     }
     sunrise?: string
     sunset?: string
+    air_quality?: any
   }
   forecast: Array<{
     date: string
     temp: number
+    maxtemp?: number
+    mintemp?: number
     condition: string
     description?: string
     icon: string
     humidity?: number
     wind_speed?: number
   }>
+  alerts?: Array<any>
   location?: {
     name: string
     country: string
@@ -113,12 +119,24 @@ export default function WeatherWidgetCompact() {
   }
 
   const gradientClass = getWeatherGradient(weather.current.weather.icon)
+  const hasAlerts = weather.alerts && weather.alerts.length > 0
+  const hasAirQuality = weather.current.air_quality
 
   return (
     <div className={`card bg-gradient-to-r ${gradientClass} border-gray-200 shadow-md overflow-hidden relative`}>
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12"></div>
       
+      {/* Alert Badge */}
+      {hasAlerts && (
+        <Link href="/weather" className="absolute top-3 left-3 z-10">
+          <div className="flex items-center space-x-1 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg hover:bg-red-600 transition-colors animate-pulse">
+            <AlertTriangle className="h-3 w-3" />
+            <span>{weather.alerts?.length || 0} Alert{(weather.alerts?.length || 0) > 1 ? 's' : ''}</span>
+          </div>
+        </Link>
+      )}
+
       <div className="relative flex items-center justify-between">
         {/* Left: Current Weather */}
         <div className="flex items-center space-x-4 flex-1">
@@ -137,9 +155,10 @@ export default function WeatherWidgetCompact() {
               {weather.current.weather.description}
             </p>
             {weather.location && (
-              <p className="text-xs text-gray-500 mt-0.5">
-                {weather.location.name}, {weather.location.country}
-              </p>
+              <Link href="/weather" className="flex items-center space-x-1 text-xs text-gray-500 mt-0.5 hover:text-blue-600 transition-colors group">
+                <MapPin className="h-3 w-3 group-hover:text-blue-600" />
+                <span>{weather.location.name}, {weather.location.country}</span>
+              </Link>
             )}
           </div>
         </div>
@@ -181,7 +200,7 @@ export default function WeatherWidgetCompact() {
                 <div>
                   <p className="text-xs text-gray-600">Sunrise</p>
                   <p className="text-xs font-bold text-gray-900">
-                    {format(new Date(weather.current.sunrise), 'HH:mm')}
+                    {weather.current.sunrise}
                   </p>
                 </div>
               </div>
@@ -191,7 +210,7 @@ export default function WeatherWidgetCompact() {
                 <div>
                   <p className="text-xs text-gray-600">Sunset</p>
                   <p className="text-xs font-bold text-gray-900">
-                    {format(new Date(weather.current.sunset), 'HH:mm')}
+                    {weather.current.sunset}
                   </p>
                 </div>
               </div>
@@ -214,6 +233,23 @@ export default function WeatherWidgetCompact() {
                 </div>
               ))}
             </div>
+          )}
+
+          {/* Air Quality Indicator */}
+          {hasAirQuality && (
+            <Link href="/weather">
+              <div className="hidden xl:flex items-center space-x-2 px-3 py-2 bg-white/40 backdrop-blur-sm rounded-lg border border-white/50 hover:bg-white/60 transition-colors cursor-pointer">
+                <Wind className="h-4 w-4 text-blue-600" />
+                <div>
+                  <p className="text-xs text-gray-600">Air Quality</p>
+                  <p className="text-xs font-bold text-gray-900">
+                    {weather.current.air_quality?.['us-epa-index'] === 1 ? 'Good' :
+                     weather.current.air_quality?.['us-epa-index'] === 2 ? 'Moderate' :
+                     weather.current.air_quality?.['us-epa-index'] === 3 ? 'Unhealthy' : 'Poor'}
+                  </p>
+                </div>
+              </div>
+            </Link>
           )}
 
           {/* Mock indicator */}

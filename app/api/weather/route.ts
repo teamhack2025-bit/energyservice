@@ -2,9 +2,8 @@ import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const lat = searchParams.get('lat') || process.env.NEXT_PUBLIC_DEFAULT_LAT || '52.52'
-  const lon = searchParams.get('lon') || process.env.NEXT_PUBLIC_DEFAULT_LON || '13.405'
-  const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY
+  const location = searchParams.get('q') || process.env.NEXT_PUBLIC_DEFAULT_LOCATION || '49.5022,5.9492'
+  const apiKey = process.env.WEATHERAPI_KEY
 
   if (!apiKey || apiKey === 'your_api_key_here') {
     // Return mock data if API key is not configured
@@ -14,89 +13,104 @@ export async function GET(request: Request) {
         feels_like: 14,
         humidity: 65,
         pressure: 1013,
-        visibility: 10000,
+        visibility: 10,
         uv_index: 3,
         weather: {
           main: 'Clouds',
           description: 'scattered clouds',
-          icon: '03d',
+          icon: '//cdn.weatherapi.com/weather/64x64/day/116.png',
         },
         wind: {
           speed: 3.5,
           deg: 200,
+          dir: 'SW',
+        },
+        air_quality: {
+          co: 230.3,
+          no2: 13.5,
+          o3: 84.3,
+          so2: 1.2,
+          pm2_5: 8.6,
+          pm10: 12.3,
+          'us-epa-index': 1,
+          'gb-defra-index': 1,
         },
       },
       forecast: [
-        { date: new Date().toISOString(), temp: 15, condition: 'Clouds', icon: '03d' },
-        { date: new Date(Date.now() + 86400000).toISOString(), temp: 18, condition: 'Clear', icon: '01d' },
-        { date: new Date(Date.now() + 172800000).toISOString(), temp: 16, condition: 'Rain', icon: '10d' },
+        { date: new Date().toISOString(), temp: 15, condition: 'Clouds', icon: '//cdn.weatherapi.com/weather/64x64/day/116.png', maxtemp: 18, mintemp: 12 },
+        { date: new Date(Date.now() + 86400000).toISOString(), temp: 18, condition: 'Clear', icon: '//cdn.weatherapi.com/weather/64x64/day/113.png', maxtemp: 20, mintemp: 14 },
+        { date: new Date(Date.now() + 172800000).toISOString(), temp: 16, condition: 'Rain', icon: '//cdn.weatherapi.com/weather/64x64/day/296.png', maxtemp: 17, mintemp: 13 },
       ],
+      alerts: [],
       mock: true,
     })
   }
 
   try {
-    // Fetch current weather
-    const currentWeatherResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+    // Fetch forecast with alerts, air quality, and all features
+    const forecastResponse = await fetch(
+      `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${location}&days=5&aqi=yes&alerts=yes`,
+      { next: { revalidate: 600 } } // Cache for 10 minutes
     )
 
-    if (!currentWeatherResponse.ok) {
+    if (!forecastResponse.ok) {
       throw new Error('Failed to fetch weather data')
     }
 
-    const currentWeather = await currentWeatherResponse.json()
+    const data = await forecastResponse.json()
 
-    // Fetch forecast (5 days, 3-hour intervals)
-    const forecastResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
-    )
-
-    let forecast = []
-    if (forecastResponse.ok) {
-      const forecastData = await forecastResponse.json()
-      // Get daily forecasts (one per day)
-      forecast = forecastData.list
-        .filter((item: any, index: number) => index % 8 === 0) // Every 24 hours (8 * 3-hour intervals)
-        .slice(0, 5)
-        .map((item: any) => ({
-          date: new Date(item.dt * 1000).toISOString(),
-          temp: Math.round(item.main.temp),
-          condition: item.weather[0].main,
-          description: item.weather[0].description,
-          icon: item.weather[0].icon,
-          humidity: item.main.humidity,
-          wind_speed: item.wind.speed,
-        }))
-    }
-
-    // Calculate UV index (requires separate API call with paid plan, so we'll estimate)
-    const uvIndex = Math.min(10, Math.max(0, Math.round((currentWeather.main.temp / 30) * 10)))
-
+    // Transform to our format
     return NextResponse.json({
       current: {
-        temp: Math.round(currentWeather.main.temp),
-        feels_like: Math.round(currentWeather.main.feels_like),
-        humidity: currentWeather.main.humidity,
-        pressure: currentWeather.main.pressure,
-        visibility: currentWeather.visibility / 1000, // Convert to km
-        uv_index: uvIndex,
+        temp: Math.round(data.current.temp_c),
+        feels_like: Math.round(data.current.feelslike_c),
+        humidity: data.current.humidity,
+        pressure: data.current.pressure_mb,
+        visibility: data.current.vis_km,
+        uv_index: data.current.uv,
         weather: {
-          main: currentWeather.weather[0].main,
-          description: currentWeather.weather[0].description,
-          icon: currentWeather.weather[0].icon,
+          main: data.current.condition.text,
+          description: data.current.condition.text.toLowerCase(),
+          icon: data.current.condition.icon,
         },
         wind: {
-          speed: currentWeather.wind.speed,
-          deg: currentWeather.wind.deg || 0,
+          speed: data.current.wind_kph / 3.6, // Convert to m/s
+          deg: data.current.wind_degree,
+          dir: data.current.wind_dir,
+          gust: data.current.gust_kph / 3.6,
         },
-        sunrise: currentWeather.sys.sunrise ? new Date(currentWeather.sys.sunrise * 1000).toISOString() : null,
-        sunset: currentWeather.sys.sunset ? new Date(currentWeather.sys.sunset * 1000).toISOString() : null,
+        air_quality: data.current.air_quality || null,
+        sunrise: data.forecast.forecastday[0].astro.sunrise,
+        sunset: data.forecast.forecastday[0].astro.sunset,
+        moonrise: data.forecast.forecastday[0].astro.moonrise,
+        moonset: data.forecast.forecastday[0].astro.moonset,
+        moon_phase: data.forecast.forecastday[0].astro.moon_phase,
       },
-      forecast,
+      forecast: data.forecast.forecastday.map((day: any) => ({
+        date: day.date,
+        temp: Math.round(day.day.avgtemp_c),
+        maxtemp: Math.round(day.day.maxtemp_c),
+        mintemp: Math.round(day.day.mintemp_c),
+        condition: day.day.condition.text,
+        description: day.day.condition.text.toLowerCase(),
+        icon: day.day.condition.icon,
+        humidity: day.day.avghumidity,
+        wind_speed: day.day.maxwind_kph / 3.6,
+        uv: day.day.uv,
+        rain_chance: day.day.daily_chance_of_rain,
+        snow_chance: day.day.daily_chance_of_snow,
+        sunrise: day.astro.sunrise,
+        sunset: day.astro.sunset,
+      })),
+      alerts: data.alerts?.alert || [],
       location: {
-        name: currentWeather.name,
-        country: currentWeather.sys.country,
+        name: data.location.name,
+        region: data.location.region,
+        country: data.location.country,
+        lat: data.location.lat,
+        lon: data.location.lon,
+        tz_id: data.location.tz_id,
+        localtime: data.location.localtime,
       },
       mock: false,
     })
@@ -116,14 +130,17 @@ export async function GET(request: Request) {
           weather: {
             main: 'Clouds',
             description: 'scattered clouds',
-            icon: '03d',
+            icon: '//cdn.weatherapi.com/weather/64x64/day/116.png',
           },
           wind: {
             speed: 3.5,
             deg: 200,
+            dir: 'SW',
           },
+          air_quality: null,
         },
         forecast: [],
+        alerts: [],
       },
       { status: 500 }
     )
