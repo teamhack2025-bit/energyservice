@@ -54,7 +54,7 @@ export interface Invoice {
   periodStart: string
   periodEnd: string
   total: number
-  status: 'paid' | 'unpaid' | 'overdue'
+  status: 'draft' | 'issued' | 'paid' | 'overdue' | 'cancelled'
   dueDate: string
   paidAt?: string
 }

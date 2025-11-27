@@ -106,7 +106,7 @@ export const mockInvoices: Invoice[] = [
     periodStart: '2024-11-01',
     periodEnd: '2024-11-30',
     total: 88.50,
-    status: 'unpaid',
+    status: 'issued',
     dueDate: '2024-12-15',
   },
 ]

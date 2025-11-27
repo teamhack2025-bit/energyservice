@@ -1,14 +1,22 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Bell, ChevronDown, User, LogOut, Settings } from 'lucide-react'
 import { mockUser, mockNotifications } from '@/lib/mockData'
 
 export default function Header() {
+  const router = useRouter()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const unreadCount = mockNotifications.filter(n => !n.read).length
+
+  const handleLogout = () => {
+    setShowUserMenu(false)
+    // Navigate to logout page which will handle the logout process
+    router.push('/logout')
+  }
 
   return (
     <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
@@ -102,7 +110,10 @@ export default function Header() {
                     Settings
                   </Link>
                   <div className="border-t border-gray-200 my-1"></div>
-                  <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
                   </button>

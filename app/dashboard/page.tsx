@@ -1,3 +1,5 @@
+'use client'
+
 import AppShell from '@/components/layout/AppShell'
 import MetricCard from '@/components/ui/MetricCard'
 import ChartCard from '@/components/ui/ChartCard'
@@ -5,12 +7,14 @@ import LineChart from '@/components/charts/LineChart'
 import DonutChart from '@/components/charts/DonutChart'
 import WeatherWidgetCompact from '@/components/weather/WeatherWidgetCompact'
 import { generateNetBalanceData } from '@/lib/mockData'
+import { useNetBalanceData } from '@/lib/hooks/useSupabaseData'
 import { Download, FileText, AlertCircle, Zap, TrendingUp, Sun, Wind, ArrowUp, ArrowDown, Activity } from 'lucide-react'
 import Link from 'next/link'
 
 export default function DashboardPage() {
-  const netBalanceData = generateNetBalanceData(30)
-  const todayNet = netBalanceData[netBalanceData.length - 1]?.netKwh || -2.5
+  const { data: netBalanceData, loading: netBalanceLoading } = useNetBalanceData(30)
+  const netBalanceDataToUse = netBalanceData.length > 0 ? netBalanceData : generateNetBalanceData(30)
+  const todayNet = netBalanceDataToUse[netBalanceDataToUse.length - 1]?.netKwh || -2.5
   const monthCost = 78.95
   const monthRevenue = 14.05
   const produced = 4.5
@@ -55,12 +59,12 @@ export default function DashboardPage() {
     },
   ]
 
-  const consumptionData = netBalanceData.map((d) => ({
+  const consumptionData = netBalanceDataToUse.map((d) => ({
     timestamp: d.timestamp,
     consumption: d.importKwh,
   }))
 
-  const productionData = netBalanceData.map((d) => ({
+  const productionData = netBalanceDataToUse.map((d) => ({
     timestamp: d.timestamp,
     production: d.exportKwh,
   }))
@@ -72,7 +76,7 @@ export default function DashboardPage() {
   ]
 
   // Last 7 days data for compact charts
-  const last7Days = netBalanceData.slice(-7)
+  const last7Days = netBalanceDataToUse.slice(-7)
 
   return (
     <AppShell>
@@ -192,17 +196,23 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-            <LineChart
-              data={netBalanceData}
-              dataKey="netKwh"
-              yAxisLabel="kWh"
-              height={250}
-              multipleSeries={[
-                { key: 'importKwh', name: 'Import', color: '#CC0000' },
-                { key: 'exportKwh', name: 'Export', color: '#00AA44' },
-              ]}
-              showLegend
-            />
+            {netBalanceLoading ? (
+              <div className="h-[250px] flex items-center justify-center">
+                <div className="text-gray-500">Loading data...</div>
+              </div>
+            ) : (
+              <LineChart
+                data={netBalanceDataToUse}
+                dataKey="netKwh"
+                yAxisLabel="kWh"
+                height={250}
+                multipleSeries={[
+                  { key: 'importKwh', name: 'Import', color: '#CC0000' },
+                  { key: 'exportKwh', name: 'Export', color: '#00AA44' },
+                ]}
+                showLegend
+              />
+            )}
           </div>
         </div>
 

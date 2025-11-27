@@ -7,10 +7,12 @@ function getStatusIcon(status: string) {
   switch (status) {
     case 'paid':
       return <CheckCircle className="h-5 w-5 text-success" />
-    case 'unpaid':
+    case 'issued':
       return <Clock className="h-5 w-5 text-warning" />
     case 'overdue':
       return <AlertCircle className="h-5 w-5 text-danger" />
+    case 'draft':
+      return <Clock className="h-5 w-5 text-gray-400" />
     default:
       return null
   }
@@ -20,10 +22,12 @@ function getStatusColor(status: string) {
   switch (status) {
     case 'paid':
       return 'text-success'
-    case 'unpaid':
+    case 'issued':
       return 'text-warning'
     case 'overdue':
       return 'text-danger'
+    case 'draft':
+      return 'text-gray-600'
     default:
       return 'text-gray-600'
   }
@@ -88,7 +92,7 @@ export default function BillingPage() {
                         <Download className="h-4 w-4 mr-1" />
                         View
                       </Link>
-                      {invoice.status === 'unpaid' && (
+                      {(invoice.status === 'issued' || invoice.status === 'overdue') && (
                         <button className="btn-primary text-sm py-1 px-3">Pay Now</button>
                       )}
                     </div>
