@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react'
 import AppShell from '@/components/layout/AppShell'
 import LiveKPIs from '@/components/energy/LiveKPIs'
-import HouseModel from '@/components/energy/HouseModel'
+import EnhancedHouseModel from '@/components/energy/EnhancedHouseModel'
 import TimelineGraph from '@/components/energy/TimelineGraph'
 import FinancialSummary from '@/components/energy/FinancialSummary'
 import AlertsPanel from '@/components/energy/AlertsPanel'
 import EnergyScore from '@/components/energy/EnergyScore'
+import ComponentDetailModal from '@/components/energy/ComponentDetailModal'
 import { EnergyFlow } from '@/types/energy'
 import { generateTimelineData, generateFinancialSummary, generateAlerts, generateEnergyScore } from '@/lib/energyData'
 import { RefreshCw, Zap, AlertCircle } from 'lucide-react'
@@ -145,15 +146,18 @@ export default function EnergyHomePage() {
 
       {/* Interactive House Model */}
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Interactive Smart Home</h2>
-        <HouseModel energyFlow={energyFlow} onZoneClick={setSelectedZone} />
-        {selectedZone && (
-          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-900">
-              <strong>Selected:</strong> {selectedZone} - Detailed view coming soon!
-            </p>
-          </div>
-        )}
+        <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+          <Zap className="h-6 w-6 text-blue-600" />
+          <span>Interactive Smart Home</span>
+        </h2>
+        <EnhancedHouseModel energyFlow={energyFlow} onZoneClick={setSelectedZone} />
+        
+        {/* Component Detail Modal */}
+        <ComponentDetailModal
+          component={selectedZone}
+          energyFlow={energyFlow}
+          onClose={() => setSelectedZone(null)}
+        />
       </div>
 
       {/* Live KPIs */}

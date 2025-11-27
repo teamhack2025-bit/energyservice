@@ -1,44 +1,154 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { EnergyFlow } from '@/types/energy'
-import { Sun, Battery, Zap, Car, Flame, Wind } from 'lucide-react'
+import { Sun, Battery, Zap, Car, Flame, Wind, ArrowRight, ArrowDown, ArrowUp } from 'lucide-react'
 
 interface HouseModelProps {
   energyFlow: EnergyFlow
   onZoneClick?: (zone: string) => void
 }
 
+// Energy flow line component
+function EnergyFlowLine({ 
+  from, 
+  to, 
+  power, 
+  color, 
+  label 
+}: { 
+  from: { x: number; y: number }
+  to: { x: number; y: number }
+  power: number
+  color: string
+  label: string
+}) {
+  if (power <= 0) return null
+
+  const angle = Math.atan2(to.y - from.y, to.x - from.x) * (180 / Math.PI)
+  const distance = Math.sqrt(Math.pow(to.x - from.x, 2) + Math.pow(to.y - from.y, 2))
+
+  return (
+    <div
+      className="absolute pointer-events-none"
+      style={{
+        left: from.x,
+        top: from.y,
+        width: distance,
+        transform: `rotate(${angle}deg)`,
+        transformOrigin: '0 0',
+      }}
+    >
+      {/* Animated flow line */}
+      <svg width={distance} height="4" className="absolute top-0">
+        <defs>
+          <linearGradient id={`gradient-${label}`} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+            <stop offset="50%" stopColor={color} stopOpacity="1" />
+            <stop offset="100%" stopColor={color} stopOpacity="0.3" />
+          </linearGradient>
+        </defs>
+        <line
+          x1="0"
+          y1="2"
+          x2={distance}
+          y2="2"
+          stroke={`url(#gradient-${label})`}
+          strokeWidth={Math.min(power * 2 + 2, 8)}
+          strokeLinecap="round"
+        />
+      </svg>
+      
+      {/* Animated particles */}
+      {[...Array(3)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-2 h-2 rounded-full"
+          style={{ backgroundColor: color, top: 1 }}
+          animate={{
+            x: [0, distance],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            delay: i * 0.7,
+            ease: 'linear',
+          }}
+        />
+      ))}
+      
+      {/* Power label */}
+      <div
+        className="absolute whitespace-nowrap text-xs font-bold px-2 py-1 rounded-full shadow-lg"
+        style={{
+          backgroundColor: color,
+          color: 'white',
+          left: distance / 2,
+          top: -20,
+          transform: `translateX(-50%) rotate(-${angle}deg)`,
+        }}
+      >
+        {power.toFixed(1)} kW
+      </div>
+    </div>
+  )
+}
+
 export default function HouseModel({ energyFlow, onZoneClick }: HouseModelProps) {
   const { solar, battery, grid, consumption, ev, gas, heatPump } = energyFlow
 
-  // Energy flow particles animation
-  const particleVariants = {
-    animate: {
-      x: [0, 100],
-      opacity: [0, 1, 0],
-      transition: {
-        duration: 2,
-        repeat: Infinity,
-        ease: 'linear',
-      },
-    },
+  // Define positions for energy flow lines
+  const positions = {
+    grid: { x: 100, y: 80 },
+    solar: { x: 400, y: 100 },
+    house: { x: 400, y: 300 },
+    battery: { x: 200, y: 450 },
+    ev: { x: 600, y: 450 },
   }
 
   return (
-    <div className="relative bg-gradient-to-b from-sky-100 to-green-50 rounded-2xl p-8 overflow-hidden border-2 border-gray-200">
-      {/* Sky background */}
-      <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-sky-200 to-sky-100"></div>
+    <div className="relative bg-gradient-to-b from-sky-200 via-sky-100 to-green-100 rounded-2xl p-8 overflow-hidden border-2 border-gray-300 shadow-xl">
+      {/* Animated clouds */}
+      <motion.div
+        className="absolute top-10 left-10 w-20 h-10 bg-white/60 rounded-full blur-sm"
+        animate={{ x: [0, 50, 0] }}
+        transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute top-20 right-20 w-24 h-12 bg-white/50 rounded-full blur-sm"
+        animate={{ x: [0, -30, 0] }}
+        transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+      />
 
-      {/* Sun */}
+      {/* Sun with rays */}
       {solar.production > 0 && (
-        <motion.div
-          className="absolute top-8 right-8"
-          animate={{ scale: [1, 1.1, 1], rotate: [0, 360] }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-        >
-          <Sun className="h-16 w-16 text-yellow-400 drop-shadow-lg" />
-        </motion.div>
+        <div className="absolute top-8 right-8">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+          >
+            <Sun className="h-20 w-20 text-yellow-400 drop-shadow-2xl" fill="currentColor" />
+          </motion.div>
+          {/* Sun rays */}
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute top-1/2 left-1/2 w-1 h-8 bg-yellow-300 origin-bottom"
+              style={{
+                transform: `translate(-50%, -100%) rotate(${i * 45}deg)`,
+              }}
+              animate={{
+                opacity: [0.3, 0.8, 0.3],
+                scaleY: [0.8, 1.2, 0.8],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                delay: i * 0.2,
+              }}
+            />
+          ))}
+        </div>
       )}
 
       {/* Grid Connection (top left) */}
