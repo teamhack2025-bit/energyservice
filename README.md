@@ -19,20 +19,6 @@
 
 URL: https://energyservice.vercel.app
 
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Project Structure](#project-structure)
-- [API Documentation](#api-documentation)
-- [Environment Variables](#environment-variables)
-- [Development](#development)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-
 ---
 
 ## 🎯 Overview
@@ -343,13 +329,6 @@ npm run dev
 5. **Open your browser**
 ```
 http://localhost:3000
-```
-
-### Quick Setup Script
-
-For first-time setup, run:
-```bash
-npm run setup  # If available, or follow manual steps above
 ```
 
 ---
