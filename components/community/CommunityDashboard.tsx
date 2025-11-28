@@ -19,6 +19,7 @@ import { CommunityDashboardData } from '@/types/community'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts'
 import CommunityMembers from './CommunityMembers'
 import { generateCommunityMembers } from '@/lib/communityData'
+import ClientTime from '@/components/common/ClientTime'
 
 interface CommunityDashboardProps {
   data: CommunityDashboardData
@@ -259,7 +260,7 @@ export default function CommunityDashboard({ data }: CommunityDashboardProps) {
           <h3 className="text-lg font-bold text-gray-900">Current Market Conditions</h3>
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <Clock className="h-4 w-4" />
-            <span>Updated {new Date(price_signals.timestamp).toLocaleTimeString()}</span>
+            <span>Updated <ClientTime date={price_signals.timestamp} format="time" /></span>
           </div>
         </div>
         
@@ -376,7 +377,7 @@ export default function CommunityDashboard({ data }: CommunityDashboardProps) {
                     {trade.buyer_anonymous_id} ↔ {trade.seller_anonymous_id}
                   </p>
                   <p className="text-xs text-gray-600">
-                    {new Date(trade.created_at).toLocaleString()}
+                    <ClientTime date={trade.created_at} format="datetime" />
                   </p>
                 </div>
               </div>

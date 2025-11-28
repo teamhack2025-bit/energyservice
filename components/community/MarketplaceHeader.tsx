@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { TrendingUp, TrendingDown, Minus, Clock, BarChart3 } from 'lucide-react'
 import { CommunityPriceSignal } from '@/types/community'
+import ClientTime from '@/components/common/ClientTime'
 
 interface MarketplaceHeaderProps {
   priceSignal: CommunityPriceSignal
@@ -58,7 +59,7 @@ export default function MarketplaceHeader({ priceSignal, marketStats }: Marketpl
           <div className="text-right">
             <div className="flex items-center space-x-2 text-blue-100 mb-2">
               <Clock className="h-4 w-4" />
-              <span className="text-sm">Updated {new Date(priceSignal.timestamp).toLocaleTimeString()}</span>
+              <span className="text-sm">Updated <ClientTime date={priceSignal.timestamp} format="time" /></span>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
               <p className="text-xs text-blue-100">Next Hour Forecast</p>

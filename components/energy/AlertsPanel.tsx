@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { AlertTriangle, Info, CheckCircle, XCircle, X, ChevronRight } from 'lucide-react'
 import { EnergyAlert } from '@/types/energy'
 import { motion, AnimatePresence } from 'framer-motion'
+import ClientTime from '@/components/common/ClientTime'
 
 interface AlertsPanelProps {
   alerts: EnergyAlert[]
@@ -125,7 +126,7 @@ export default function AlertsPanel({ alerts, onDismiss }: AlertsPanelProps) {
                     </button>
                   )}
                   <p className="text-xs text-gray-500 mt-2">
-                    {new Date(alert.timestamp).toLocaleString()}
+                    <ClientTime date={alert.timestamp} format="datetime" />
                   </p>
                 </div>
               </div>
