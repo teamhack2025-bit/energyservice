@@ -235,7 +235,7 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
 
           {/* Central consumption indicator */}
           <motion.div
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"
+            className="absolute top-1/2 right-[-120px] transform -translate-y-1/2 z-10"
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
@@ -243,7 +243,7 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
               <Zap className="h-12 w-12 text-white" />
             </div>
             <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded-lg shadow-xl border-2 border-orange-500 whitespace-nowrap">
-              <p className="text-xs font-bold text-gray-600">Total Load</p>
+              <p className="text-xs font-bold text-gray-600">Total Power</p>
               <p className="text-lg font-bold text-orange-600">{consumption.total.toFixed(1)} kW</p>
             </div>
           </motion.div>
