@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import AppShell from '@/components/layout/AppShell'
+import DeviceFormModal from '@/components/devices/DeviceFormModal'
 import { 
   Zap, 
   Sun, 
@@ -17,7 +18,10 @@ import {
   Hash,
   Building2,
   RefreshCw,
-  Waves
+  Waves,
+  Plus,
+  Edit,
+  Trash2
 } from 'lucide-react'
 
 interface Device {
@@ -28,7 +32,7 @@ interface Device {
   brand: string
   room: string
   serialNumber: string
-  houseId: string
+  houseId?: string
 }
 
 const getDeviceIcon = (type: string, name: string) => {
@@ -80,6 +84,10 @@ export default function DevicesPage() {
   const [count, setCount] = useState(0)
   const [filter, setFilter] = useState<string>('all')
   const [roomFilter, setRoomFilter] = useState<string>('all')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
+  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
   const fetchDevices = async () => {
     setLoading(true)
@@ -103,6 +111,66 @@ export default function DevicesPage() {
   useEffect(() => {
     fetchDevices()
   }, [])
+
+  const handleCreateDevice = async (deviceData: any) => {
+    const response = await fetch('/api/devices', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(deviceData),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to create device')
+    }
+
+    await fetchDevices()
+  }
+
+  const handleEditDevice = async (deviceData: any) => {
+    const response = await fetch('/api/devices', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(deviceData),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to update device')
+    }
+
+    await fetchDevices()
+  }
+
+  const handleDeleteDevice = async (deviceId: string) => {
+    const response = await fetch(`/api/devices?id=${deviceId}`, {
+      method: 'DELETE',
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to delete device')
+    }
+
+    setDeleteConfirm(null)
+    await fetchDevices()
+  }
+
+  const openCreateModal = () => {
+    setModalMode('create')
+    setSelectedDevice(null)
+    setIsModalOpen(true)
+  }
+
+  const openEditModal = (device: Device) => {
+    setModalMode('edit')
+    setSelectedDevice(device)
+    setIsModalOpen(true)
+  }
 
   const filteredDevices = devices.filter(device => {
     const typeMatch = filter === 'all' || device.type === filter
@@ -140,13 +208,22 @@ export default function DevicesPage() {
               Manage and monitor all your connected devices
             </p>
           </div>
-          <button
-            onClick={fetchDevices}
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <RefreshCw className="h-4 w-4" />
-            <span>Refresh</span>
-          </button>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={openCreateModal}
+              className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Add Device</span>
+            </button>
+            <button
+              onClick={fetchDevices}
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span>Refresh</span>
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -287,6 +364,41 @@ export default function DevicesPage() {
                     {device.type.charAt(0).toUpperCase() + device.type.slice(1)}
                   </span>
                 </div>
+
+                {/* Action Buttons */}
+                <div className="mt-4 flex items-center space-x-2">
+                  <button
+                    onClick={() => openEditModal(device)}
+                    className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                  >
+                    <Edit className="h-4 w-4" />
+                    <span>Edit</span>
+                  </button>
+                  {deleteConfirm === device.id ? (
+                    <div className="flex-1 flex items-center space-x-2">
+                      <button
+                        onClick={() => handleDeleteDevice(device.id)}
+                        className="flex-1 px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => setDeleteConfirm(null)}
+                        className="flex-1 px-3 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setDeleteConfirm(device.id)}
+                      className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span>Delete</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           )
@@ -299,6 +411,15 @@ export default function DevicesPage() {
           <p className="text-gray-500">No devices found matching your filters</p>
         </div>
       )}
+
+      {/* Device Form Modal */}
+      <DeviceFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={modalMode === 'create' ? handleCreateDevice : handleEditDevice}
+        device={selectedDevice}
+        mode={modalMode}
+      />
     </AppShell>
   )
 }
