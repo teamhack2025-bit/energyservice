@@ -52,10 +52,15 @@ export async function POST(request: Request) {
     
     const body = await request.json()
     
-    // Add house_id to the device data
+    // Add houseId to the device data
     const deviceData = {
-      ...body,
-      house_id: houseId
+      name: body.name,
+      purchaseDate: body.purchaseDate,
+      type: body.type,
+      brand: body.brand,
+      room: body.room,
+      serialNumber: body.serialNumber,
+      houseId: houseId
     }
     
     console.log('Creating device:', deviceData)
@@ -72,7 +77,14 @@ export async function POST(request: Request) {
     )
     
     if (!response.ok) {
-      const errorData = await response.json()
+      const errorText = await response.text()
+      console.error('API Error Response:', errorText)
+      let errorData
+      try {
+        errorData = JSON.parse(errorText)
+      } catch {
+        errorData = { error: errorText }
+      }
       throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
     }
     
@@ -92,7 +104,9 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const body = await request.json()
-    const { id, ...updateData } = body
+    const userId = 'default-user'
+    const houseId = await HouseIdManager.getHouseIdForUser(userId)
+    const { id } = body
     
     if (!id) {
       return NextResponse.json(
@@ -101,6 +115,18 @@ export async function PUT(request: Request) {
       )
     }
     
+    // Build update data with camelCase
+    const updateData: any = {}
+    if (body.id) updateData.id = body.id
+    if (body.name) updateData.name = body.name
+    if (body.purchaseDate) updateData.purchaseDate = body.purchaseDate
+    if (body.type) updateData.type = body.type
+    if (body.brand) updateData.brand = body.brand
+    if (body.room) updateData.room = body.room
+    if (body.serialNumber) updateData.serialNumber = body.serialNumber
+    
+    updateData.houseId = houseId
+
     console.log('Updating device:', id, updateData)
     
     const response = await fetch(
@@ -115,7 +141,14 @@ export async function PUT(request: Request) {
     )
     
     if (!response.ok) {
-      const errorData = await response.json()
+      const errorText = await response.text()
+      console.error('API Error Response:', errorText)
+      let errorData
+      try {
+        errorData = JSON.parse(errorText)
+      } catch {
+        errorData = { error: errorText }
+      }
       throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
     }
     
