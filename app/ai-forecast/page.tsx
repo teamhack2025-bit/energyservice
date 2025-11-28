@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import AppShell from '@/components/layout/AppShell'
 import ChartCard from '@/components/ui/ChartCard'
 import ForecastLineChart from '@/components/charts/ForecastLineChart'
-import { Brain, TrendingUp, Zap, Sun, Battery, Grid3x3, Loader2, AlertCircle, Lightbulb, Target, Clock, CheckCircle2, AlertTriangle, Info, ArrowDown } from 'lucide-react'
+import { Brain, TrendingUp, Zap, Sun, Battery, Grid3x3, Loader2, AlertCircle, Lightbulb, Target, Clock, CheckCircle2, AlertTriangle, Info, ArrowDown, DollarSign, TrendingDown, Calendar, Leaf, AlertCircle as AlertCircleIcon } from 'lucide-react'
 import { parseISO, format } from 'date-fns'
 
 interface PredictionData {
@@ -76,15 +76,105 @@ interface AIEnergyInsightsResponse {
   }
 }
 
+interface CostOptimizationResponse {
+  house_id: string
+  scenario: string
+  parameters: Record<string, any>
+  generated_at: string
+  analysis: {
+    scenario_name: string
+    investment_summary: {
+      upfront_cost_eur: number
+      installation_cost_eur: number
+      total_investment_eur: number
+      financing_options: string[]
+    }
+    savings_projection: {
+      annual_energy_savings_kwh: number
+      annual_cost_savings_eur: number
+      monthly_savings_eur: number
+      first_year_savings_eur: number
+    }
+    roi_analysis: {
+      payback_period_years: number
+      roi_percentage: number
+      net_present_value_eur: number
+      internal_rate_of_return: number
+    }
+    five_year_projection: Array<{
+      year: number
+      cumulative_savings_eur: number
+      cumulative_cost_eur: number
+      net_benefit_eur: number
+    }>
+    environmental_impact: {
+      co2_reduction_kg_year: number
+      trees_equivalent: number
+      renewable_percentage: number
+    }
+    risks: Array<{
+      risk: string
+      severity: string
+      mitigation: string
+    }>
+    alternatives: Array<{
+      option: string
+      cost_eur: number
+      pros: string[]
+      cons: string[]
+    }>
+    recommendation: {
+      verdict: 'recommended' | 'not_recommended' | 'conditional'
+      confidence: string
+      reasoning: string
+      best_time_to_implement: string
+      priority_score: number
+    }
+  }
+  disclaimer: string
+}
+
 export default function AIForecastPage() {
   const [data, setData] = useState<PredictionResponse | null>(null)
   const [aiInsights, setAiInsights] = useState<AIEnergyInsightsResponse | null>(null)
+  const [costOptimization, setCostOptimization] = useState<CostOptimizationResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [insightsLoading, setInsightsLoading] = useState(true)
+  const [optimizationLoading, setOptimizationLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [currentDate] = useState(new Date())
   const [selectedMetric, setSelectedMetric] = useState<string>('grid')
+  const [selectedScenario, setSelectedScenario] = useState<string>('add_battery')
   const recommendationsRef = useRef<HTMLDivElement>(null)
+
+  const fetchCostOptimization = async (scenario: string) => {
+    try {
+      setOptimizationLoading(true)
+      const response = await fetch(`/api/ai/optimize?scenario=${scenario}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      })
+      
+      if (response.ok) {
+        const optimizationData = await response.json()
+        setCostOptimization(optimizationData)
+      } else {
+        console.error('Failed to fetch cost optimization')
+      }
+    } catch (err) {
+      console.error('Error fetching cost optimization:', err)
+    } finally {
+      setOptimizationLoading(false)
+    }
+  }
+
+  const handleScenarioChange = (scenario: string) => {
+    setSelectedScenario(scenario)
+    fetchCostOptimization(scenario)
+  }
 
   useEffect(() => {
     async function fetchPredictions() {
@@ -129,6 +219,9 @@ export default function AIForecastPage() {
 
     fetchPredictions()
     fetchAIInsights()
+    // Load default scenario on mount
+    fetchCostOptimization(selectedScenario)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Determine which data points are historical vs predicted
@@ -522,6 +615,216 @@ export default function AIForecastPage() {
           </div>
         </div>
       )}
+
+      {/* Cost Optimization Scenarios */}
+      <div className="mb-6">
+        <ChartCard 
+          title="Cost Optimization Scenarios"
+          subtitle="AI-powered investment analysis and ROI projections"
+        >
+          <div className="space-y-6">
+            {/* Scenario Selector */}
+            <div>
+              <label className="text-sm font-semibold text-gray-700 mb-3 block">Select Optimization Scenario</label>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                {[
+                  { key: 'add_battery', label: 'Add Battery', icon: Battery, selectedClass: 'border-blue-500 bg-blue-50', iconClass: 'text-blue-600', textClass: 'text-blue-900' },
+                  { key: 'add_solar', label: 'Add Solar', icon: Sun, selectedClass: 'border-yellow-500 bg-yellow-50', iconClass: 'text-yellow-600', textClass: 'text-yellow-900' },
+                  { key: 'upgrade_hvac', label: 'Upgrade HVAC', icon: Zap, selectedClass: 'border-green-500 bg-green-50', iconClass: 'text-green-600', textClass: 'text-green-900' },
+                  { key: 'change_tariff', label: 'Change Tariff', icon: DollarSign, selectedClass: 'border-purple-500 bg-purple-50', iconClass: 'text-purple-600', textClass: 'text-purple-900' },
+                  { key: 'add_ev_charger', label: 'Add EV Charger', icon: Zap, selectedClass: 'border-orange-500 bg-orange-50', iconClass: 'text-orange-600', textClass: 'text-orange-900' },
+                ].map((scenario) => {
+                  const Icon = scenario.icon
+                  const isSelected = selectedScenario === scenario.key
+                  return (
+                    <button
+                      key={scenario.key}
+                      onClick={() => handleScenarioChange(scenario.key)}
+                      disabled={optimizationLoading}
+                      className={`
+                        p-3 rounded-lg border-2 transition-all text-left
+                        ${isSelected 
+                          ? `${scenario.selectedClass} shadow-md` 
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                        }
+                        ${optimizationLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                      `}
+                    >
+                      <Icon className={`h-5 w-5 mb-1 ${isSelected ? scenario.iconClass : 'text-gray-600'}`} />
+                      <div className={`text-xs font-medium ${isSelected ? scenario.textClass : 'text-gray-700'}`}>
+                        {scenario.label}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Optimization Results */}
+            {optimizationLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 text-primary animate-spin mr-3" />
+                <span className="text-gray-600">Analyzing cost optimization scenario...</span>
+              </div>
+            ) : costOptimization ? (
+              <div className="space-y-4">
+                {/* Recommendation Verdict */}
+                <div className={`
+                  p-4 rounded-lg border-2
+                  ${costOptimization.analysis.recommendation.verdict === 'recommended' 
+                    ? 'bg-green-50 border-green-200' 
+                    : costOptimization.analysis.recommendation.verdict === 'conditional'
+                    ? 'bg-yellow-50 border-yellow-200'
+                    : 'bg-red-50 border-red-200'
+                  }
+                `}>
+                  <div className="flex items-start gap-3">
+                    {costOptimization.analysis.recommendation.verdict === 'recommended' ? (
+                      <CheckCircle2 className="h-6 w-6 text-green-600 flex-shrink-0 mt-0.5" />
+                    ) : costOptimization.analysis.recommendation.verdict === 'conditional' ? (
+                      <AlertCircleIcon className="h-6 w-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-bold text-gray-900">
+                          {costOptimization.analysis.scenario_name}
+                        </h4>
+                        <span className={`
+                          px-3 py-1 rounded-full text-xs font-bold uppercase
+                          ${costOptimization.analysis.recommendation.verdict === 'recommended' 
+                            ? 'bg-green-200 text-green-800' 
+                            : costOptimization.analysis.recommendation.verdict === 'conditional'
+                            ? 'bg-yellow-200 text-yellow-800'
+                            : 'bg-red-200 text-red-800'
+                          }
+                        `}>
+                          {costOptimization.analysis.recommendation.verdict.replace('_', ' ')}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700 mb-2">
+                        {costOptimization.analysis.recommendation.reasoning}
+                      </p>
+                      {costOptimization.analysis.recommendation.best_time_to_implement && (
+                        <p className="text-xs text-gray-600 italic">
+                          💡 {costOptimization.analysis.recommendation.best_time_to_implement}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Key Metrics Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {/* Investment */}
+                  <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <DollarSign className="h-5 w-5 text-blue-600" />
+                      <span className="text-xs font-medium text-gray-600">Investment</span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">
+                      €{costOptimization.analysis.investment_summary.total_investment_eur.toLocaleString()}
+                    </p>
+                  </div>
+
+                  {/* Annual Savings */}
+                  <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingDown className="h-5 w-5 text-green-600" />
+                      <span className="text-xs font-medium text-gray-600">Annual Savings</span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">
+                      €{costOptimization.analysis.savings_projection.annual_cost_savings_eur.toLocaleString()}
+                    </p>
+                  </div>
+
+                  {/* Payback Period */}
+                  <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Calendar className="h-5 w-5 text-purple-600" />
+                      <span className="text-xs font-medium text-gray-600">Payback Period</span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {costOptimization.analysis.roi_analysis.payback_period_years.toFixed(1)} yrs
+                    </p>
+                  </div>
+
+                  {/* ROI */}
+                  <div className="p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg border border-orange-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="h-5 w-5 text-orange-600" />
+                      <span className="text-xs font-medium text-gray-600">ROI</span>
+                    </div>
+                    <p className={`text-2xl font-bold ${costOptimization.analysis.roi_analysis.roi_percentage >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                      {costOptimization.analysis.roi_analysis.roi_percentage >= 0 ? '+' : ''}
+                      {costOptimization.analysis.roi_analysis.roi_percentage.toFixed(1)}%
+                    </p>
+                  </div>
+                </div>
+
+                {/* Savings Breakdown */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 bg-white rounded-lg border border-gray-200">
+                    <p className="text-xs text-gray-600 mb-1">Monthly Savings</p>
+                    <p className="text-xl font-bold text-gray-900">
+                      €{costOptimization.analysis.savings_projection.monthly_savings_eur.toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="p-4 bg-white rounded-lg border border-gray-200">
+                    <p className="text-xs text-gray-600 mb-1">Energy Savings (Annual)</p>
+                    <p className="text-xl font-bold text-gray-900">
+                      {costOptimization.analysis.savings_projection.annual_energy_savings_kwh.toLocaleString()} kWh
+                    </p>
+                  </div>
+                  <div className="p-4 bg-white rounded-lg border border-gray-200">
+                    <p className="text-xs text-gray-600 mb-1">CO₂ Reduction</p>
+                    <p className="text-xl font-bold text-green-700 flex items-center gap-1">
+                      <Leaf className="h-4 w-4" />
+                      {costOptimization.analysis.environmental_impact.co2_reduction_kg_year.toLocaleString()} kg/yr
+                    </p>
+                  </div>
+                </div>
+
+                {/* 5-Year Projection Preview */}
+                {costOptimization.analysis.five_year_projection && costOptimization.analysis.five_year_projection.length > 0 && (
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h5 className="text-sm font-semibold text-gray-900 mb-3">5-Year Projection</h5>
+                    <div className="space-y-2">
+                      {costOptimization.analysis.five_year_projection.slice(0, 3).map((year) => (
+                        <div key={year.year} className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Year {year.year}</span>
+                          <div className="flex items-center gap-4">
+                            <span className="text-gray-700">Savings: €{year.cumulative_savings_eur.toLocaleString()}</span>
+                            <span className={`font-semibold ${year.net_benefit_eur >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                              Net: €{year.net_benefit_eur.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                      {costOptimization.analysis.five_year_projection.length > 3 && (
+                        <p className="text-xs text-gray-500 pt-2 border-t border-gray-200">
+                          + {costOptimization.analysis.five_year_projection.length - 3} more years...
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Disclaimer */}
+                <p className="text-xs text-gray-500 italic">
+                  {costOptimization.disclaimer}
+                </p>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <DollarSign className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+                <p>Select a scenario above to see cost optimization analysis</p>
+              </div>
+            )}
+          </div>
+        </ChartCard>
+      </div>
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
