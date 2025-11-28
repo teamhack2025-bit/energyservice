@@ -64,15 +64,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
-      <div className="flex items-center justify-between h-16 px-4 md:pl-72">
-        {/* Site Selector */}
-        <div className="flex items-center">
-          <select className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-            <option>Home (123 Main St)</option>
-            <option>Office (456 Oak Ave)</option>
-          </select>
-        </div>
-
+      <div className="flex items-center justify-end h-16 px-4 md:pl-72">
         {/* Right side */}
         <div className="flex items-center space-x-4">
           {/* Notifications */}

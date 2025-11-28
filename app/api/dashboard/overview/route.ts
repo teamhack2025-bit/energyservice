@@ -5,6 +5,7 @@ import { HouseIdManager } from '@/lib/services/HouseIdManager'
 import { generateNetBalanceData } from '@/lib/mockData'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function GET(request: Request) {
   try {
@@ -26,6 +27,12 @@ export async function GET(request: Request) {
       ...internalData,
       fallbackUsed: false,
       houseId,
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
     })
   } catch (error) {
     console.error('Dashboard API error:', error)
@@ -84,6 +91,12 @@ export async function GET(request: Request) {
       fallbackUsed: true,
     }
     
-    return NextResponse.json(mockData)
+    return NextResponse.json(mockData, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    })
   }
 }

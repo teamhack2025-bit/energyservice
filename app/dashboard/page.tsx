@@ -11,28 +11,65 @@ export default function DashboardPage() {
   const [dashboardData, setDashboardData] = React.useState<any>(null)
   const [loading, setLoading] = React.useState(true)
   const [fallbackUsed, setFallbackUsed] = React.useState(false)
+  const [lastRefresh, setLastRefresh] = React.useState<Date>(new Date())
   
-  React.useEffect(() => {
-    fetch('/api/dashboard/overview')
+  const fetchDashboardData = React.useCallback(() => {
+    console.log('Fetching dashboard data at:', new Date().toLocaleTimeString())
+    fetch('/api/dashboard/overview', {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
+    })
       .then(res => res.json())
       .then(data => {
+        console.log('Dashboard data received:', data)
+        console.log('Metrics structure:', data.metrics)
+        console.log('Today stats:', data.todayStats)
+        console.log('Monthly stats:', data.monthlyStats)
         setDashboardData(data)
         setFallbackUsed(data.fallbackUsed || false)
         setLoading(false)
+        setLastRefresh(new Date())
       })
       .catch(err => {
         console.error('Error fetching dashboard data:', err)
         setLoading(false)
       })
   }, [])
+
+  React.useEffect(() => {
+    // Initial fetch
+    fetchDashboardData()
+    
+    // Refresh every 4 seconds
+    const interval = setInterval(fetchDashboardData, 4000)
+    
+    // Cleanup interval on unmount
+    return () => clearInterval(interval)
+  }, [fetchDashboardData])
   
   // Extract data from API response
-  const todayNet = dashboardData?.todayStats?.netBalance || -2.5
-  const monthCost = dashboardData?.monthlyStats?.cost || 78.95
-  const monthRevenue = dashboardData?.monthlyStats?.revenue || 14.05
-  const todayConsumption = dashboardData?.todayStats?.consumption || 15.2
-  const todayProduction = dashboardData?.todayStats?.production || 18.5
-  const efficiency = dashboardData?.todayStats?.efficiency || 72
+  const todayNet = dashboardData?.todayStats?.netBalance ?? -2.5
+  const monthCost = dashboardData?.monthlyStats?.cost ?? 78.95
+  const monthRevenue = dashboardData?.monthlyStats?.revenue ?? 14.05
+  const todayConsumption = dashboardData?.todayStats?.consumption ?? 15.2
+  const todayProduction = dashboardData?.todayStats?.production ?? 18.5
+  const efficiency = dashboardData?.todayStats?.efficiency ?? 72
+  
+  // Debug: Log extracted values
+  React.useEffect(() => {
+    if (dashboardData) {
+      console.log('Extracted values:', {
+        todayNet,
+        monthCost,
+        monthRevenue,
+        todayConsumption,
+        todayProduction,
+        efficiency
+      })
+    }
+  }, [dashboardData, todayNet, monthCost, monthRevenue, todayConsumption, todayProduction, efficiency])
 
   const metrics = [
     {
@@ -116,7 +153,7 @@ export default function DashboardPage() {
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-600">Real-time energy monitoring</p>
+          <p className="text-sm text-gray-600">Real-time energy monitoring • Auto-refresh every 4s</p>
         </div>
         <div className="flex items-center space-x-2">
           {fallbackUsed && (
@@ -125,6 +162,9 @@ export default function DashboardPage() {
               Using cached data
             </span>
           )}
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+            Last update: {lastRefresh.toLocaleTimeString()}
+          </span>
           <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
             fallbackUsed ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'
           }`}>
