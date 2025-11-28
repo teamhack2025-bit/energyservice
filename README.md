@@ -19,6 +19,8 @@
 
 URL: https://energyservice.vercel.app
 
+API: https://github.com/teamhack2025-bit/energyserviceapi
+
 ---
 
 ## 🎯 Overview
