@@ -12,6 +12,10 @@ interface EnhancedHouseModelProps {
 export default function EnhancedHouseModel({ energyFlow, onZoneClick }: EnhancedHouseModelProps) {
   const { solar, battery, grid, consumption, ev, gas, heatPump } = energyFlow
 
+  // CRITICAL FIX: Ensure only ONE direction for grid flow at a time
+  const isImporting = grid.import > 0.01 // Small threshold to avoid floating point issues
+  const isExporting = grid.export > 0.01 && !isImporting // Export only if NOT importing
+
   return (
     <div className="relative bg-gradient-to-b from-sky-300 via-sky-100 to-green-50 rounded-3xl p-8 overflow-hidden border-4 border-gray-300 shadow-2xl min-h-[600px]">
       {/* Time of day indicator */}
@@ -54,29 +58,31 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
           whileHover={{ scale: 1.1 }}
         >
           <div className={`relative p-5 rounded-2xl shadow-2xl border-4 transition-all ${
-            grid.import > 0 
+            isImporting
               ? 'bg-gradient-to-br from-yellow-400 to-amber-500 border-yellow-600' 
-              : 'bg-gradient-to-br from-cyan-400 to-blue-500 border-cyan-600'
+              : isExporting
+              ? 'bg-gradient-to-br from-cyan-400 to-blue-500 border-cyan-600'
+              : 'bg-gradient-to-br from-gray-400 to-gray-500 border-gray-600'
           }`}>
             <Zap className="h-10 w-10 text-white" />
-            {grid.import > 0 ? (
+            {isImporting ? (
               <TrendingDown className="absolute -top-2 -right-2 h-6 w-6 text-red-600 bg-white rounded-full p-1" />
-            ) : grid.export > 0 ? (
+            ) : isExporting ? (
               <TrendingUp className="absolute -top-2 -right-2 h-6 w-6 text-green-600 bg-white rounded-full p-1" />
             ) : null}
           </div>
           <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white px-3 py-1.5 rounded-lg shadow-lg border-2 border-gray-300 whitespace-nowrap">
             <p className="text-xs font-bold text-gray-600">Grid</p>
-            <p className={`text-sm font-bold ${grid.import > 0 ? 'text-yellow-600' : 'text-cyan-600'}`}>
-              {grid.import > 0 ? `↓ ${grid.import.toFixed(1)}` : `↑ ${grid.export.toFixed(1)}`} kW
+            <p className={`text-sm font-bold ${isImporting ? 'text-yellow-600' : isExporting ? 'text-cyan-600' : 'text-gray-600'}`}>
+              {isImporting ? `↓ ${grid.import.toFixed(1)}` : isExporting ? `↑ ${grid.export.toFixed(1)}` : '0.0'} kW
             </p>
           </div>
           
           {/* Connection line from grid to main flow */}
-          {grid.import > 0 && (
+          {isImporting && (
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-1 h-24 bg-gradient-to-b from-yellow-500/30 to-transparent" />
           )}
-          {grid.export > 0 && (
+          {isExporting && (
             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-1 h-24 bg-gradient-to-t from-cyan-500/30 to-transparent" />
           )}
         </motion.div>
@@ -278,10 +284,10 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
           {battery.power !== 0 && (
             <path d="M 140 450 Q 250 400 350 350" stroke="#3b82f6" strokeWidth="3" strokeOpacity="0.2" strokeDasharray="5,5" fill="none" />
           )}
-          {grid.import > 0 && (
+          {isImporting && (
             <path d="M 80 120 Q 200 180 320 280" stroke="#f59e0b" strokeWidth="3" strokeOpacity="0.2" strokeDasharray="5,5" fill="none" />
           )}
-          {grid.export > 0 && (
+          {isExporting && (
             <path d="M 320 280 Q 200 180 80 120" stroke="#06b6d4" strokeWidth="3" strokeOpacity="0.2" strokeDasharray="5,5" fill="none" />
           )}
 
@@ -367,8 +373,8 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
             </>
           )}
 
-          {/* Grid Import - Curved path to house */}
-          {grid.import > 0 && (
+          {/* Grid Import - Curved path to house - ONLY if importing */}
+          {isImporting && (
             <>
               <path id="gridImportPath" d="M 80 120 Q 200 180 320 280" fill="none" />
               {[...Array(7)].map((_, i) => (
@@ -395,8 +401,8 @@ export default function EnhancedHouseModel({ energyFlow, onZoneClick }: Enhanced
             </>
           )}
 
-          {/* Grid Export - Curved path from house */}
-          {grid.export > 0 && (
+          {/* Grid Export - Curved path from house - ONLY if exporting */}
+          {isExporting && (
             <>
               <path id="gridExportPath" d="M 320 280 Q 200 180 80 120" fill="none" />
               {[...Array(7)].map((_, i) => (
