@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Zap, Mail, Lock, User, Phone } from 'lucide-react'
+import Logo from '@/components/common/Logo'
 
 function LoginForm() {
   const router = useRouter()
@@ -138,11 +139,10 @@ function LoginForm() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-4 shadow-lg">
-            <Zap className="w-8 h-8 text-white" />
+          <div className="flex justify-center mb-4">
+            <Logo isDark={false} className="scale-150" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Energy Portal</h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mt-4">
             {isSignup ? 'Create your account' : 'Sign in to your account'}
           </p>
         </div>

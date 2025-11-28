@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export function generateMetadata(): Metadata {
   return {
-    title: 'Energy Customer Portal',
+    title: 'Watts Next',
     description: 'Monitor your energy consumption and production',
     other: {
       ...Sentry.getTraceData()

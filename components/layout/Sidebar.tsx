@@ -22,9 +22,12 @@ import {
   Sparkles,
   Leaf,
   Brain,
-  Calculator
+  Calculator,
+  Moon
 } from 'lucide-react'
 import clsx from 'clsx'
+import Logo from '@/components/common/Logo'
+import { useTheme } from '@/lib/hooks/useTheme'
 
 type NavigationItem = {
   name: string
@@ -62,6 +65,8 @@ const deactivatedNavigation: NavigationItem[] = [
 export default function Sidebar() {
   const pathname = usePathname()
   const [isComingSoonOpen, setIsComingSoonOpen] = useState(false)
+  const { theme, toggleTheme, mounted } = useTheme()
+  const isDark = theme === 'dark'
 
   const renderNavItem = (item: NavigationItem) => {
     const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
@@ -76,11 +81,16 @@ export default function Sidebar() {
             isActive && !isDeactivated && !isInProgress
               ? 'text-white'
               : isDeactivated
-              ? 'text-gray-300'
+              ? isDark ? 'text-gray-600' : 'text-gray-300'
+              : isDark 
+              ? 'text-gray-400 group-hover:text-gray-300'
               : 'text-gray-400 group-hover:text-gray-500'
           )}
         />
-        <span className="flex-1">{item.name}</span>
+        <span className={clsx(
+          'flex-1',
+          isDark && !isActive && !isDeactivated && !isInProgress ? 'text-gray-300' : ''
+        )}>{item.name}</span>
         {isInProgress && (
           <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
             Coming Soon
@@ -93,7 +103,10 @@ export default function Sidebar() {
       return (
         <div
           key={item.name}
-          className="group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-400 cursor-not-allowed opacity-50"
+          className={clsx(
+            'group flex items-center px-3 py-2 text-sm font-medium rounded-lg cursor-not-allowed opacity-50',
+            isDark ? 'text-gray-600' : 'text-gray-400'
+          )}
         >
           {content}
         </div>
@@ -108,6 +121,8 @@ export default function Sidebar() {
           'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors',
           isActive
             ? 'bg-primary text-white'
+            : isDark
+            ? 'text-gray-300 hover:bg-gray-800 hover:text-white'
             : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
         )}
       >
@@ -116,11 +131,38 @@ export default function Sidebar() {
     )
   }
 
+  if (!mounted) {
+    return null
+  }
+
   return (
     <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-      <div className="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto">
-        <div className="flex items-center flex-shrink-0 px-4 h-16 border-b border-gray-200">
-          <h1 className="text-xl font-bold text-primary">Energy Portal</h1>
+      <div className={`
+        flex flex-col flex-grow border-r overflow-y-auto transition-colors duration-300
+        ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}
+      `}>
+        <div className={`
+          flex items-center justify-between flex-shrink-0 px-4 h-16 border-b transition-colors duration-300
+          ${isDark ? 'border-gray-800' : 'border-gray-200'}
+        `}>
+          <Logo isDark={isDark} />
+          <button
+            onClick={toggleTheme}
+            className={`
+              p-2 rounded-lg transition-all duration-300 hover:scale-110
+              ${isDark 
+                ? 'text-white hover:bg-gray-800' 
+                : 'text-gray-900 hover:bg-gray-100'
+              }
+            `}
+            aria-label="Toggle theme"
+          >
+            {isDark ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </button>
         </div>
         <div className="mt-5 flex-1 flex flex-col">
           <nav className="flex-1 px-2 space-y-1">
@@ -129,12 +171,17 @@ export default function Sidebar() {
 
             {/* Deactivated Items */}
             {deactivatedNavigation.map(renderNavItem)}
-            
+
             {/* Coming Soon Section */}
             <div className="pt-4">
               <button
                 onClick={() => setIsComingSoonOpen(!isComingSoonOpen)}
-                className="w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                className={clsx(
+                  'w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+                  isDark 
+                    ? 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                )}
               >
                 <Sparkles className="mr-3 flex-shrink-0 h-5 w-5 text-yellow-500" />
                 <span className="flex-1 text-left">Coming Soon</span>
