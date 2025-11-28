@@ -43,12 +43,12 @@ const activeNavigation: NavigationItem[] = [
 ]
 
 const comingSoonNavigation: NavigationItem[] = [
-  { name: 'Community', href: '/community', icon: Users, status: 'in-progress' },
-  { name: 'Net Balance', href: '/net-balance', icon: DollarSign, status: 'in-progress' },
-  { name: 'Billing', href: '/billing', icon: FileText, status: 'in-progress' },
-  { name: 'Contracts', href: '/contracts', icon: FileCheck, status: 'in-progress' },
-  { name: 'Support', href: '/support', icon: HelpCircle, status: 'in-progress' },
-  { name: 'Settings', href: '/settings', icon: Settings, status: 'in-progress' },
+  { name: 'Community', href: '/community', icon: Users},
+  { name: 'Net Balance', href: '/net-balance', icon: DollarSign},
+  { name: 'Billing', href: '/billing', icon: FileText},
+  { name: 'Contracts', href: '/contracts', icon: FileCheck},
+  { name: 'Support', href: '/support', icon: HelpCircle},
+  { name: 'Settings', href: '/settings', icon: Settings},
 ]
 
 const deactivatedNavigation: NavigationItem[] = [
@@ -123,6 +123,9 @@ export default function Sidebar() {
             {/* Active Navigation Items */}
             {activeNavigation.map(renderNavItem)}
 
+            {/* Deactivated Items */}
+            {deactivatedNavigation.map(renderNavItem)}
+            
             {/* Coming Soon Section */}
             <div className="pt-4">
               <button
@@ -145,8 +148,6 @@ export default function Sidebar() {
               )}
             </div>
 
-            {/* Deactivated Items */}
-            {deactivatedNavigation.map(renderNavItem)}
           </nav>
         </div>
       </div>
