@@ -334,7 +334,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Quick Actions - Compact Grid */}
+      {/* Quick Actions - Compact Grid 
       <div className="card bg-gradient-to-br from-white to-gray-50 border-gray-100 shadow-lg p-4">
         <h3 className="text-base font-bold text-gray-900 mb-3">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -375,7 +375,7 @@ export default function DashboardPage() {
             </div>
           </Link>
         </div>
-      </div>
+      </div>*/}
     </AppShell>
   )
 }
