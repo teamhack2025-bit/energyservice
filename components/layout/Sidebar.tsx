@@ -42,7 +42,6 @@ const activeNavigation: NavigationItem[] = [
   { name: 'Weather', href: '/weather', icon: Cloud, status: 'active' },
   { name: 'Consumption', href: '/consumption', icon: BarChart3, status: 'active' },
   { name: 'Devices', href: '/devices', icon: Plug, status: 'active' },
-  { name: 'Forecast', href: '/forecast', icon: TrendingUp, status: 'active' },
   { name: 'AI Forecast', href: '/ai-forecast', icon: Brain, status: 'active' },
   { name: 'AI Cost Optimization', href: '/ai-cost-optimization', icon: Calculator, status: 'active' },
   { name: 'Sustainability Board', href: '/sustainability', icon: Leaf, status: 'active' },
@@ -56,10 +55,12 @@ const comingSoonNavigation: NavigationItem[] = [
   { name: 'Contracts', href: '/contracts', icon: FileCheck},
   { name: 'Support', href: '/support', icon: HelpCircle},
   { name: 'Settings', href: '/settings', icon: Settings},
+  { name: 'Production', href: '/production', icon: Sun, status: 'deactivated' },
+
+
 ]
 
 const deactivatedNavigation: NavigationItem[] = [
-  { name: 'Production', href: '/production', icon: Sun, status: 'deactivated' },
 ]
 
 export default function Sidebar() {
