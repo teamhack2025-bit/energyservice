@@ -146,7 +146,6 @@ export default function SustainabilityPage() {
             <div className="text-right">
               <p className="text-green-100 mb-2">Rank</p>
               <p className="text-4xl font-bold">#{leaderboard?.currentUserRank || 'N/A'}</p>
-              <p className="text-green-100 mt-2">of {leaderboard?.totalParticipants || 0} users</p>
             </div>
           </div>
         </div>

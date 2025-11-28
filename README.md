@@ -1,201 +1,462 @@
-# Energy Customer Portal - Product Specification
+# ⚡ Watts Next - Energy As A Service
 
-Complete product specification, data model, API design, and UI documentation for a full-featured Customer Portal serving energy consumers, prosumers, and hybrid users.
+<div align="center">
 
-## 📚 Documentation Structure
 
-This repository contains comprehensive documentation for designing and implementing a Customer Portal for an energy company startup:
 
-### 1. [PRODUCT_SPECIFICATION.md](./PRODUCT_SPECIFICATION.md)
-**Main product specification document covering:**
-- User types and roles (Customer, Prosumer, Business, Admin)
-- Complete sitemap and navigation structure
-- Module overviews (12 main sections)
-- User journeys and workflows
-- Design principles and KPIs
-- Future enhancements roadmap
+![Watts Next Logo](https://img.shields.io/badge/Watts%20Next-Energy%20Portal-blue?style=for-the-badge)
 
-### 2. [DATA_MODEL.md](./DATA_MODEL.md)
-**Complete data model specification including:**
-- Entity relationship diagrams
-- TypeScript interfaces for all entities
-- Core entities: User, Account, Site, Meter, Contract, Invoice, etc.
-- Production entities: SolarSystem, Inverter, Battery, EVCharger
-- Support entities: Ticket, Notification, AlertPreference
-- Database indexes and relationships
+**AI-Powered Energy Management & Optimization Platform**
 
-### 3. [API_DESIGN.md](./API_DESIGN.md)
-**RESTful API and GraphQL schema design:**
-- Complete REST API endpoints (50+ endpoints)
-- Authentication and authorization
-- Consumption, production, and net balance APIs
-- Billing and payment endpoints
-- Device and asset management
-- Forecast and insights APIs
-- Admin endpoints
-- GraphQL schema (alternative approach)
-- Error handling and rate limiting
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-2.86-3ecf8e?style=flat-square&logo=supabase)](https://supabase.com/)
 
-### 4. [UI_COMPONENTS.md](./UI_COMPONENTS.md)
-**Detailed UI component library and page descriptions:**
-- Core UI components (Layout, Data Display, Forms, Status)
-- Chart components (Line, Bar, Donut, Gauge, Heatmap)
-- Form components (DateRangePicker, Select, Input, Button)
-- Complete page layouts for all 12 modules
-- Responsive behavior (Mobile, Tablet, Desktop)
-- Accessibility features
-
-### 5. [WIREFRAMES.md](./WIREFRAMES.md)
-**Visual wireframes and layout descriptions:**
-- Design system (colors, typography, spacing)
-- Layout grids for desktop and mobile
-- Detailed wireframes for key pages
-- Component wireframes
-- Mobile adaptations
-- Interaction patterns
-- Animation guidelines
-
-## 🎯 Key Features
-
-### For Consumers
-- Real-time and historical consumption analytics
-- Cost tracking and billing management
-- Contract and tariff management
-- Usage comparisons and benchmarking
-- Goal setting and tracking
-
-### For Prosumers
-- Production monitoring (solar, wind, battery)
-- Self-consumption and export tracking
-- Feed-in revenue management
-- Net balance visualization
-- Device status monitoring
-
-### For Businesses
-- Multi-site management
-- Business-specific analytics
-- Tax reporting data
-- Team access capabilities
-
-### For Admins
-- Customer management
-- Contract and tariff administration
-- Manual meter reading adjustments
-- Ticket management
-- System monitoring
-
-## 🏗️ Technical Stack (Recommended)
-
-- **Framework:** Next.js 14+ (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS
-- **Data Fetching:** TanStack Query (React Query)
-- **Charts:** Recharts or Chart.js
-- **Forms:** React Hook Form + Zod
-- **Tables:** TanStack Table
-- **Date Handling:** date-fns
-- **State Management:** Zustand or React Context
-
-## 📋 Implementation Checklist
-
-### Phase 1: Foundation
-- [ ] Project setup (Next.js, TypeScript, Tailwind)
-- [ ] Authentication system (JWT)
-- [ ] Layout components (AppShell, Sidebar, Header)
-- [ ] Core UI components (Button, Input, Card, etc.)
-- [ ] Routing structure
-
-### Phase 2: Core Features
-- [ ] Dashboard page
-- [ ] Consumption module
-- [ ] Production module
-- [ ] Net balance view
-- [ ] Basic charts integration
-
-### Phase 3: Billing & Contracts
-- [ ] Billing page and invoice detail
-- [ ] Payment methods management
-- [ ] Contracts and tariffs
-- [ ] Tariff comparison tool
-
-### Phase 4: Devices & Assets
-- [ ] Device listing and detail pages
-- [ ] Meter management
-- [ ] Solar system monitoring
-- [ ] Battery and EV charger views
-
-### Phase 5: Advanced Features
-- [ ] Forecast and insights
-- [ ] Notifications system
-- [ ] Support ticketing
-- [ ] Settings and profile management
-
-### Phase 6: Admin Console
-- [ ] Admin dashboard
-- [ ] Customer management
-- [ ] Ticket management
-- [ ] System monitoring
-
-## 🔐 Security Considerations
-
-- JWT-based authentication with refresh tokens
-- Role-based access control (RBAC)
-- Input validation and sanitization
-- SQL injection prevention (parameterized queries)
-- XSS protection
-- CSRF tokens for state-changing operations
-- Rate limiting on API endpoints
-- Secure password storage (bcrypt)
-- Two-factor authentication (2FA) support
-
-## ♿ Accessibility
-
-- WCAG 2.1 AA compliance
-- Keyboard navigation support
-- Screen reader compatibility
-- ARIA labels and roles
-- Color contrast requirements
-- Focus indicators
-- Skip links
-
-## 📱 Responsive Design
-
-- **Mobile:** < 640px (single column, drawer navigation)
-- **Tablet:** 640px - 1024px (2 columns, adapted navigation)
-- **Desktop:** > 1024px (full layout, sidebar navigation)
-- **Large Desktop:** > 1440px (optimized spacing)
-
-## 🚀 Getting Started
-
-1. Review the [PRODUCT_SPECIFICATION.md](./PRODUCT_SPECIFICATION.md) for overall understanding
-2. Study the [DATA_MODEL.md](./DATA_MODEL.md) for database schema
-3. Review [API_DESIGN.md](./API_DESIGN.md) for backend integration
-4. Use [UI_COMPONENTS.md](./UI_COMPONENTS.md) for component implementation
-5. Reference [WIREFRAMES.md](./WIREFRAMES.md) for visual design guidance
-
-## 📝 Notes
-
-- All monetary values should support multiple currencies (EUR, USD, etc.)
-- Date/time handling should respect user timezone settings
-- Charts should be interactive and exportable
-- Data exports should support CSV and PDF formats
-- Real-time updates via WebSocket (optional, Phase 2+)
-
-## 🤝 Contributing
-
-This is a specification document. When implementing:
-1. Follow the data models and API contracts defined here
-2. Maintain consistency with the UI component library
-3. Ensure responsive design across all breakpoints
-4. Test accessibility features thoroughly
-5. Document any deviations from the specification
-
-## 📄 License
-
-This specification is provided for implementation purposes.
+</div>
 
 ---
 
-**Last Updated:** January 2025  
-**Version:** 1.0.0
+URL: https://energyservice.vercel.app
 
+## 📋 Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [API Documentation](#api-documentation)
+- [Environment Variables](#environment-variables)
+- [Development](#development)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+
+---
+
+## 🎯 Overview
+
+**Watts Next** is a comprehensive energy management platform that empowers users to monitor, analyze, and optimize their energy consumption and production. Built with Next.js 14, TypeScript, and modern web technologies, it provides real-time insights, AI-powered forecasts, cost optimization scenarios, and sustainability tracking.
+
+### Key Capabilities
+
+- **Real-time Energy Monitoring** - Live dashboard with energy flow visualization
+- **AI-Powered Forecasting** - Predictive analytics for consumption and production
+- **Cost Optimization** - Investment scenarios with ROI analysis
+- **Sustainability Tracking** - CO₂ reduction, trees saved, and efficiency metrics
+- **Smart Home Integration** - Device management and control
+- **Community Features** - P2P energy trading and sharing groups
+- **Weather Integration** - Weather-based energy insights
+
+---
+
+## ✨ Features
+
+### 🏠 Dashboard & Analytics
+- Real-time energy flow visualization
+- Historical consumption and production charts
+- Net balance tracking (import/export)
+- Financial summaries and cost tracking
+- Multi-site support for businesses
+
+### 🤖 AI Features
+- **AI Forecast** - Predictive energy consumption and production forecasts
+- **AI Cost Optimization** - Investment scenario analysis with ROI projections
+- **AI Recommendations** - Personalized energy optimization suggestions
+- **Next Hour Predictions** - Hourly consumption and cost predictions
+
+### 📊 Energy Management
+- Consumption analytics with detailed breakdowns
+- Production monitoring (solar, battery, grid)
+- Device status and management
+- Energy sharing groups
+- P2P energy marketplace
+
+### 🌱 Sustainability
+- CO₂ reduction tracking
+- Trees saved calculations
+- Water saved metrics
+- Efficiency scores
+- Sustainability leaderboard
+- Environmental impact visualization
+
+### 🌤️ Weather Integration
+- Current weather conditions
+- 5-day forecast
+- Air quality data
+- Weather-based energy insights
+
+### 👥 Community & Trading
+- P2P energy marketplace
+- Energy sharing groups
+- Trading history
+- Community dashboard
+
+### ⚙️ Admin Features
+- Customer management
+- User administration
+- System monitoring
+- Support ticket management
+
+---
+
+## 🏗️ Architecture
+
+### System Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         CLIENT LAYER                            │
+│                                                                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │   Web App    │  │  Mobile App  │  │  Admin Panel │          │
+│  │  (Next.js)   │  │(First screen)│  │  (Next.js)   │          │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘          │
+│         │                  │                  │                  │
+└─────────┼──────────────────┼──────────────────┼──────────────────┘
+          │                  │                  │
+          └──────────────────┼──────────────────┘
+                             │
+┌────────────────────────────┼────────────────────────────────────┐
+│                    NEXT.JS APPLICATION LAYER                   │
+│                                                                   │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │              App Router (Pages & API Routes)             │  │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐│  │
+│  │  │ Dashboard│  │ Forecast │  │ Devices  │  │  Admin  ││  │
+│  │  └──────────┘  └──────────┘  └──────────┘  └─────────┘│  │
+│  │                                                          │  │
+│  │  ┌──────────────────────────────────────────────────┐  │  │
+│  │  │         API Routes (Server Components)           │  │  │
+│  │  │  /api/dashboard  /api/predictions  /api/devices │  │  │
+│  │  │  /api/ai/*       /api/energy/*    /api/auth/*   │  │  │
+│  │  └──────────────────────────────────────────────────┘  │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                   │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │              Component Layer                              │  │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐│  │
+│  │  │  Layout  │  │  Charts  │  │  Energy  │  │  UI     ││  │
+│  │  └──────────┘  └──────────┘  └──────────┘  └─────────┘│  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                   │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │              Service Layer                                │  │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐              │  │
+│  │  │External  │  │Dashboard │  │Data      │              │  │
+│  │  │Energy    │  │Service   │  │Transformer│             │  │
+│  │  │Service   │  └──────────┘  └──────────┘              │  │
+│  │  └──────────┘                                            │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+          ┌──────────────────┼──────────────────┐
+          │                  │                  │
+┌─────────┼──────────────────┼──────────────────┼──────────────────┐
+│         │                  │                  │                  │
+│  ┌──────▼──────┐  ┌───────▼──────┐  ┌───────▼──────┐          │
+│  │  Supabase   │  │ External API │  │  Weather API  │          │
+│  │  Database   │  │ (Energy      │  │  (WeatherAPI) │          │
+│  │  + Auth     │  │  Service)    │  │               │          │
+│  └─────────────┘  └──────────────┘  └───────────────┘          │
+│                                                                   │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │              External Services                           │  │
+│  │  • Energy Service API (energyserviceapi.vercel.app)      │  │
+│  │  • Weather API (weatherapi.com)                         │  │
+│  │  • Sentry (Error Tracking)                              │  │
+│  │  • n8n (AI Chatbot Webhook)                             │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+### Component Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Application Flow                          │
+└─────────────────────────────────────────────────────────────┘
+
+User Request
+    │
+    ▼
+┌─────────────────┐
+│  App Router     │  (Next.js App Router)
+│  - Pages        │
+│  - API Routes   │
+└────────┬────────┘
+         │
+         ├─────────────────┐
+         │                 │
+    ┌────▼────┐      ┌────▼────┐
+    │  Pages  │      │ API      │
+    │         │      │ Routes   │
+    └────┬────┘      └────┬────┘
+         │                 │
+         │                 │
+    ┌────▼─────────────────▼────┐
+    │   Components              │
+    │   - Layout                │
+    │   - Charts                │
+    │   - Energy Components     │
+    │   - UI Components         │
+    └────┬──────────────────────┘
+         │
+    ┌────▼────┐
+    │ Services│
+    │ - API   │
+    │ - Data  │
+    │ - Utils │
+    └────┬────┘
+         │
+    ┌────▼────┐
+    │ External│
+    │ APIs    │
+    └─────────┘
+```
+
+### Data Flow
+
+```
+┌─────────────┐
+│   Browser   │
+└──────┬──────┘
+       │
+       │ HTTP Request
+       ▼
+┌─────────────────────────────────────┐
+│      Next.js API Route Handler      │
+│  (app/api/*/route.ts)               │
+└──────┬──────────────────────────────┘
+       │
+       ├─────────────────────┐
+       │                     │
+       ▼                     ▼
+┌──────────────┐    ┌──────────────────┐
+│  Supabase    │    │  External API    │
+│  Client      │    │  (Energy Service)│
+└──────┬───────┘    └────────┬─────────┘
+       │                     │
+       │                     │
+       └──────────┬──────────┘
+                  │
+                  ▼
+         ┌────────────────┐
+         │  Data Transform│
+         │  & Validation  │
+         └────────┬───────┘
+                  │
+                  ▼
+         ┌────────────────┐
+         │  JSON Response │
+         └────────┬───────┘
+                  │
+                  ▼
+         ┌────────────────┐
+         │  React Component│
+         │  (Rendered)    │
+         └────────────────┘
+```
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript 5.3
+- **Styling:** Tailwind CSS 3.4
+- **Icons:** Lucide React
+- **Charts:** Recharts 2.15
+- **Animations:** Framer Motion 12.23
+- **Date Handling:** date-fns 3.0
+
+### Backend
+- **Runtime:** Node.js 18+
+- **API:** Next.js API Routes
+- **Database:** Supabase (PostgreSQL)
+- **Authentication:** Supabase Auth
+- **File Storage:** Supabase Storage
+
+### External Services
+- **Energy API:** energyserviceapi.vercel.app
+- **Weather API:** weatherapi.com
+- **Error Tracking:** Sentry
+- **AI Chatbot:** n8n Webhook
+
+### Development Tools
+- **Package Manager:** npm
+- **Testing:** Vitest
+- **Linting:** ESLint
+- **Type Checking:** TypeScript
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- npm or yarn package manager
+- Supabase account (for database and auth)
+- Environment variables configured
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone <repository-url>
+```
+
+2. **Install dependencies**
+```bash
+npm install
+```
+
+3. **Set up environment variables**
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local` with your configuration:
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# External APIs
+EXTERNAL_ENERGY_API_URL=https://energyserviceapi.vercel.app
+WEATHERAPI_KEY=your_weather_api_key
+
+# Sentry (optional)
+SENTRY_DSN=your_sentry_dsn
+NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn
+```
+
+4. **Start development server**
+```bash
+npm run dev
+```
+
+5. **Open your browser**
+```
+http://localhost:3000
+```
+
+### Quick Setup Script
+
+For first-time setup, run:
+```bash
+npm run setup  # If available, or follow manual steps above
+```
+
+---
+
+## 📁 Project Structure
+
+```
+energyservice/
+├── app/                          # Next.js App Router
+│   ├── (routes)/                 # Public routes
+│   │   ├── dashboard/            # Main dashboard
+│   │   ├── ai-forecast/          # AI forecasting
+│   │   ├── ai-cost-optimization/ # Cost optimization
+│   │   ├── consumption/          # Consumption analytics
+│   │   ├── energy-home/          # Smart home dashboard
+│   │   ├── sustainability/      # Sustainability board
+│   │   ├── weather/              # Weather integration
+│   │   └── ...                   # Other pages
+│   ├── api/                      # API routes
+│   │   ├── dashboard/            # Dashboard APIs
+│   │   ├── ai/                   # AI endpoints
+│   │   ├── energy/               # Energy APIs
+│   │   ├── devices/              # Device APIs
+│   │   ├── sustainability/      # Sustainability APIs
+│   │   └── ...                   # Other APIs
+│   ├── admin/                    # Admin panel
+│   ├── auth/                     # Auth pages
+│   ├── layout.tsx                # Root layout
+│   └── globals.css               # Global styles
+│
+├── components/                   # React components
+│   ├── layout/                   # Layout components
+│   │   ├── AppShell.tsx         # Main app shell
+│   │   ├── Sidebar.tsx          # Navigation sidebar
+│   │   └── Header.tsx           # Top header
+│   ├── charts/                  # Chart components
+│   │   ├── LineChart.tsx
+│   │   ├── BarChart.tsx
+│   │   ├── DonutChart.tsx
+│   │   └── ForecastLineChart.tsx
+│   ├── energy/                  # Energy components
+│   ├── sustainability/          # Sustainability components
+│   ├── common/                  # Common components
+│   │   └── Logo.tsx            # App logo
+│   └── ui/                      # UI components
+│
+├── lib/                         # Utilities and services
+│   ├── services/                # Service classes
+│   │   ├── ExternalEnergyService.ts
+│   │   ├── DashboardService.ts
+│   │   └── DataTransformer.ts
+│   ├── hooks/                   # Custom React hooks
+│   │   └── useTheme.ts         # Theme management
+│   ├── supabase/               # Supabase utilities
+│   └── utils/                  # Helper functions
+│
+├── types/                       # TypeScript types
+│   ├── energy.ts
+│   ├── external-api.ts
+│   └── index.ts
+│
+├── public/                     # Static assets
+├── scripts/                    # Utility scripts
+└── supabase/                   # Database migrations
+```
+
+---
+
+## 📡 API Documentation
+
+### Internal API Routes
+
+The application provides Next.js API routes that proxy to external services:
+
+#### Dashboard APIs
+- `GET /api/dashboard/overview` - Dashboard overview data
+- `GET /api/dashboard/realtime` - Real-time energy data
+
+#### AI APIs
+- `GET /api/predictions` - Energy predictions
+- `GET /api/ai/energy-insights?date={date}` - AI insights and recommendations
+- `POST /api/ai/optimize?scenario={scenario}` - Cost optimization analysis
+
+#### Energy APIs
+- `GET /api/energy/realtime` - Real-time energy flow
+- `GET /api/energy/smart-home` - Smart home data
+
+#### Device APIs
+- `GET /api/devices` - List all devices
+
+#### Sustainability APIs
+- `GET /api/sustainability/metrics` - Sustainability metrics
+- `GET /api/sustainability/devices` - Device sustainability data
+- `GET /api/sustainability/leaderboard` - Leaderboard data
+
+#### Weather APIs
+- `GET /api/weather?q={location}` - Weather data
+
+### External API Integration
+
+The application integrates with:
+- **Energy Service API:** `https://energyserviceapi.vercel.app`
+- **Weather API:** `https://api.weatherapi.com`
+
+For complete API documentation, see [energyserviceapi](https://github.com/teamhack2025-bit/energyserviceapi)
+
+---
+
+**Last Updated:** November 2025  
+**Version:** 1.0.0
