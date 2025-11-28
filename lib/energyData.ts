@@ -26,8 +26,11 @@ export function generateLiveEnergyFlow(): EnergyFlow {
     ? Math.min(solarProduction - totalConsumption, 5) // Charging
     : totalConsumption > solarProduction ? -Math.min(totalConsumption - solarProduction, 3) : 0 // Discharging
   
-  // Grid interaction
-  const netPower = solarProduction + batteryPower - totalConsumption
+  // Grid interaction - FIXED: Only one direction at a time
+  // Calculate net power: positive = excess (export), negative = deficit (import)
+  const netPower = solarProduction - batteryPower - totalConsumption
+  
+  // At any given time, EITHER importing OR exporting, never both
   const gridImport = netPower < 0 ? Math.abs(netPower) : 0
   const gridExport = netPower > 0 ? netPower : 0
   

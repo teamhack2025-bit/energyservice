@@ -2,12 +2,18 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import AIChatbot from '@/components/chatbot/AIChatbot'
+import * as Sentry from '@sentry/nextjs'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: 'Energy Customer Portal',
-  description: 'Monitor your energy consumption and production',
+export function generateMetadata(): Metadata {
+  return {
+    title: 'Energy Customer Portal',
+    description: 'Monitor your energy consumption and production',
+    other: {
+      ...Sentry.getTraceData()
+    }
+  }
 }
 
 export default function RootLayout({
