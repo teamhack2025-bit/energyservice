@@ -1,4 +1,4 @@
-# ⚡ Watts Next - Energy Management Platform
+# ⚡ Watts Next - Energy As A Service
 
 <div align="center">
 
@@ -17,7 +17,7 @@
 
 ---
 
-URL: https://energyserviceapi.vercel.app
+URL: https://energyservice.vercel.app
 
 ## 📋 Table of Contents
 
@@ -111,7 +111,7 @@ URL: https://energyserviceapi.vercel.app
 │                                                                   │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
 │  │   Web App    │  │  Mobile App  │  │  Admin Panel │          │
-│  │  (Next.js)   │  │ (React Native)│  │  (Next.js)  │          │
+│  │  (Next.js)   │  │(First screen)│  │  (Next.js)   │          │
 │  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘          │
 │         │                  │                  │                  │
 └─────────┼──────────────────┼──────────────────┼──────────────────┘
@@ -307,7 +307,6 @@ User Request
 1. **Clone the repository**
 ```bash
 git clone <repository-url>
-cd hacathon-customer-2025
 ```
 
 2. **Install dependencies**
@@ -336,17 +335,12 @@ SENTRY_DSN=your_sentry_dsn
 NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn
 ```
 
-4. **Run database migrations** (if using Supabase)
-```bash
-# Follow instructions in SUPABASE_SETUP.md
-```
-
-5. **Start development server**
+4. **Start development server**
 ```bash
 npm run dev
 ```
 
-6. **Open your browser**
+5. **Open your browser**
 ```
 http://localhost:3000
 ```
@@ -363,7 +357,7 @@ npm run setup  # If available, or follow manual steps above
 ## 📁 Project Structure
 
 ```
-hacathon-customer-2025/
+energyservice/
 ├── app/                          # Next.js App Router
 │   ├── (routes)/                 # Public routes
 │   │   ├── dashboard/            # Main dashboard
@@ -460,199 +454,7 @@ The application integrates with:
 - **Energy Service API:** `https://energyserviceapi.vercel.app`
 - **Weather API:** `https://api.weatherapi.com`
 
-For complete API documentation, see [MOBILE_API_DOCUMENTATION.md](./MOBILE_API_DOCUMENTATION.md)
-
----
-
-## 🔐 Environment Variables
-
-### Required Variables
-
-```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-# External Energy API
-EXTERNAL_ENERGY_API_URL=https://energyserviceapi.vercel.app
-
-# Weather API (Optional)
-WEATHERAPI_KEY=your_weather_api_key
-```
-
-### Optional Variables
-
-```env
-# Sentry Error Tracking
-SENTRY_DSN=your_sentry_dsn
-NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn
-
-# Default Location
-NEXT_PUBLIC_DEFAULT_LOCATION=49.5022,5.9492
-```
-
----
-
-## 💻 Development
-
-### Available Scripts
-
-```bash
-# Development
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-
-# Code Quality
-npm run lint         # Run ESLint
-npm test             # Run tests
-npm run test:watch   # Run tests in watch mode
-
-# Utilities
-npm run generate-data # Generate mock data
-npm run test-api     # Test API endpoints
-```
-
-### Development Workflow
-
-1. **Create a feature branch**
-```bash
-git checkout -b feature/your-feature-name
-```
-
-2. **Make your changes**
-   - Follow TypeScript types
-   - Use existing component patterns
-   - Add proper error handling
-
-3. **Test your changes**
-```bash
-npm run lint
-npm test
-npm run build
-```
-
-4. **Commit and push**
-```bash
-git add .
-git commit -m "feat: your feature description"
-git push origin feature/your-feature-name
-```
-
-### Code Style
-
-- Use TypeScript for all new files
-- Follow existing component patterns
-- Use Tailwind CSS for styling
-- Follow the existing file structure
-- Add JSDoc comments for complex functions
-
----
-
-## 🚢 Deployment
-
-### Vercel Deployment (Recommended)
-
-1. **Connect your repository to Vercel**
-2. **Configure environment variables** in Vercel dashboard
-3. **Deploy automatically** on push to main branch
-
-### Manual Deployment
-
-```bash
-# Build the application
-npm run build
-
-# Start production server
-npm start
-```
-
-### Environment Setup
-
-Ensure all environment variables are set in your deployment platform:
-- Vercel: Project Settings → Environment Variables
-- Other platforms: Follow their environment variable configuration
-
----
-
-## 🧪 Testing
-
-### Running Tests
-
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests with UI
-npm run test:ui
-```
-
-### Test Structure
-
-```
-__tests__/
-├── components/      # Component tests
-├── lib/            # Utility tests
-└── api/            # API route tests
-```
-
----
-
-## 📚 Additional Documentation
-
-- [Product Specification](./PRODUCT_SPECIFICATION.md) - Complete product spec
-- [API Design](./API_DESIGN.md) - API documentation
-- [Data Model](./DATA_MODEL.md) - Database schema
-- [Mobile API Docs](./MOBILE_API_DOCUMENTATION.md) - Mobile app API reference
-- [Setup Guide](./SUPABASE_SETUP.md) - Supabase setup instructions
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-### Contribution Guidelines
-
-- Follow the existing code style
-- Add tests for new features
-- Update documentation as needed
-- Ensure all tests pass before submitting
-
----
-
-## 📄 License
-
-This project is proprietary software. All rights reserved.
-
----
-
-## 👥 Team
-
-Built with ⚡ by the Watts Next team
-
----
-
-## 🔗 Links
-
-- **Production:** [Your production URL]
-- **Staging:** [Your staging URL]
-- **Documentation:** [Your docs URL]
-- **API Docs:** [MOBILE_API_DOCUMENTATION.md](./MOBILE_API_DOCUMENTATION.md)
-
----
-
-## 📞 Support
-
-For support, email support@wattsnext.com or create an issue in the repository.
+For complete API documentation, see [energyserviceapi](https://github.com/teamhack2025-bit/energyserviceapi)
 
 ---
 
