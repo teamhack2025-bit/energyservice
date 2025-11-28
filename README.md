@@ -398,44 +398,60 @@ energyservice/
 ```
 
 ---
+## 🔑 Key Technical Decisions
 
-## 📡 API Documentation
+### 1. Serverless Deployment (Vercel)
+**Why**: Auto-scaling, zero maintenance, global CDN, cost-effective  
+**Trade-off**: Cold start (~1-2s), 10s timeout, 50MB limit
 
-### Internal API Routes
+### 2. AWS S3 Storage
+**Why**: Simple setup, cost-effective, works with serverless  
+**Trade-off**: Slower writes, no complex queries, manual consistency
 
-The application provides Next.js API routes that proxy to external services:
+### 3. OpenAI GPT-4o-mini
+**Why**: No ML training, natural language insights, fast development  
+**Trade-off**: External dependency, 5-10s response, token limits
 
-#### Dashboard APIs
-- `GET /api/dashboard/overview` - Dashboard overview data
-- `GET /api/dashboard/realtime` - Real-time energy data
+### 4. FastAPI Framework
+**Why**: Auto docs, data validation, async support, type hints  
+**Trade-off**: Smaller ecosystem than Flask
 
-#### AI APIs
-- `GET /api/predictions` - Energy predictions
-- `GET /api/ai/energy-insights?date={date}` - AI insights and recommendations
-- `POST /api/ai/optimize?scenario={scenario}` - Cost optimization analysis
+### 5. Auto-Generated IDs (D300+)
+**Why**: No manual tracking, prevents duplicates, sequential  
+**Trade-off**: Requires scanning existing devices
 
-#### Energy APIs
-- `GET /api/energy/realtime` - Real-time energy flow
-- `GET /api/energy/smart-home` - Smart home data
+### 6. Background Tasks for Notifications
+**Why**: Non-blocking responses, better UX  
+**Trade-off**: No retry mechanism, lost if timeout
 
-#### Device APIs
-- `GET /api/devices` - List all devices
+---
 
-#### Sustainability APIs
-- `GET /api/sustainability/metrics` - Sustainability metrics
-- `GET /api/sustainability/devices` - Device sustainability data
-- `GET /api/sustainability/leaderboard` - Leaderboard data
+## ⚠️ Known Limitations
 
-#### Weather APIs
-- `GET /api/weather?q={location}` - Weather data
+### Performance
+- **AI Response Time**: 5-10 seconds (OpenAI processing)
+- **S3 Writes**: Slow for large files (full rewrite)
+- **Cold Start**: 1-2 seconds on first request
 
-### External API Integration
+### Data
+- **No Real-time**: Data updates every 15s (simulated)
+- **Limited History**: Only 1 year of data
+- **No Validation**: S3 files can have invalid data
 
-The application integrates with:
-- **Energy Service API:** `https://energyserviceapi.vercel.app`
-- **Weather API:** `https://api.weatherapi.com`
+### Features
+- **No Authentication**: Single-tenant, no user management
+- **No Aggregation**: Can't compare multiple houses easily
+- **Email Only**: Push notifications need manual setup
 
-For complete API documentation, see [energyserviceapi](https://github.com/teamhack2025-bit/energyserviceapi)
+### Scalability
+- **S3 Consistency**: Eventual consistency, race conditions
+- **OpenAI Limits**: 3,500 req/min (Tier 1)
+- **No Caching**: Every request hits S3/OpenAI
+
+### Security
+- **No Rate Limiting**: Can be abused
+- **Limited Sanitization**: Basic validation only
+- **Env Variables**: Secrets in environment
 
 ---
 
