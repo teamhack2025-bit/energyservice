@@ -20,7 +20,8 @@ import {
   ChevronDown,
   ChevronRight,
   Sparkles,
-  Leaf
+  Leaf,
+  Brain
 } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -38,6 +39,7 @@ const activeNavigation: NavigationItem[] = [
   { name: 'Consumption', href: '/consumption', icon: BarChart3, status: 'active' },
   { name: 'Devices', href: '/devices', icon: Plug, status: 'active' },
   { name: 'Forecast', href: '/forecast', icon: TrendingUp, status: 'active' },
+  { name: 'AI Forecast', href: '/ai-forecast', icon: Brain, status: 'active' },
   { name: 'Sustainability Board', href: '/sustainability', icon: Leaf, status: 'active' },
   { name: 'Notifications', href: '/notifications', icon: Bell, status: 'active' },
 ]
